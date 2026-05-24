@@ -8,4 +8,6 @@
   Run `npm i` to install the dependencies.
 
   Run `npm run dev` to start the development server.
+
+  The sitemap URL is available at `https://fenixsites.co.za/sitemap.xml` for submission to Google Search Console.
   
