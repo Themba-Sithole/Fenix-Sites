@@ -154,7 +154,7 @@ export function Services() {
   const pricingTiers = [
     {
       name: "Landing Page",
-      price: "R 1,400",
+      price: "R 2,500",
       description: "Perfect for single-page sites & campaigns",
       pages: "1 Page",
       features: [
@@ -169,7 +169,7 @@ export function Services() {
     },
     {
       name: "Basic",
-      price: "R 3,000",
+      price: "R 5,500",
       description: "Great for small businesses",
       pages: "3 Pages",
       features: [
@@ -185,7 +185,7 @@ export function Services() {
     },
     {
       name: "Business",
-      price: "R 5,000",
+      price: "R 9,500",
       description: "Ideal for established businesses",
       pages: "5 Pages",
       features: [
@@ -201,7 +201,7 @@ export function Services() {
     },
     {
       name: "Professional",
-      price: "R 9,000",
+      price: "R 16,000",
       description: "For advanced business needs",
       pages: "5+ Pages",
       features: [
@@ -218,7 +218,7 @@ export function Services() {
     },
     {
       name: "E-commerce",
-      price: "R 15,000",
+      price: "R 27,500",
       description: "Full online store solution",
       pages: "Store",
       features: [
