@@ -33,9 +33,10 @@ const encodedPassword = encodeURIComponent(dbPassword);
 const sql = readFileSync(resolve(__dirname, "../supabase/schema.sql"), "utf8");
 
 const connectionCandidates = [
+  `postgresql://postgres.${projectRef}:${encodedPassword}@aws-1-eu-central-1.pooler.supabase.com:5432/postgres`,
+  `postgresql://postgres.${projectRef}:${encodedPassword}@aws-1-eu-central-1.pooler.supabase.com:6543/postgres`,
   `postgresql://postgres:${encodedPassword}@db.${projectRef}.supabase.co:5432/postgres`,
   `postgresql://postgres.${projectRef}:${encodedPassword}@aws-0-eu-central-1.pooler.supabase.com:5432/postgres`,
-  `postgresql://postgres.${projectRef}:${encodedPassword}@aws-0-eu-central-1.pooler.supabase.com:6543/postgres`,
 ];
 
 let client;
