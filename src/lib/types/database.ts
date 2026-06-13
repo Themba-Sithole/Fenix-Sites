@@ -1,3 +1,21 @@
+export type InquiryStatus = "new" | "read" | "replied" | "archived";
+
+export interface Inquiry {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  budget: string | null;
+  service: string | null;
+  message: string;
+  status: InquiryStatus;
+  created_at: string;
+}
+
+export type InquiryInsert = Omit<Inquiry, "id" | "created_at" | "status"> & {
+  status?: InquiryStatus;
+};
+
 export type ClientStatus = "lead" | "active" | "completed" | "inactive";
 
 export type ProjectFilter =

@@ -2,7 +2,7 @@
  * Applies supabase/schema.sql to the Fenix Sites database.
  * Run: node scripts/setup-database.mjs
  */
-import { readFileSync } from "fs";
+import { readFileSync, readdirSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import pg from "pg";
@@ -69,6 +69,19 @@ if (!client) {
 
 try {
   await client.query(sql);
+
+  const migrationsDir = resolve(__dirname, "../supabase/migrations");
+  try {
+    const migrations = readdirSync(migrationsDir).filter((f) => f.endsWith(".sql")).sort();
+    for (const file of migrations) {
+      const migrationSql = readFileSync(resolve(migrationsDir, file), "utf8");
+      await client.query(migrationSql);
+      console.log(`Applied migration: ${file}`);
+    }
+  } catch {
+    // migrations folder optional
+  }
+
   console.log("Database schema applied successfully.");
   console.log("Tables ready: clients, projects");
 } catch (err) {

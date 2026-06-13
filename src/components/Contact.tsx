@@ -9,6 +9,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "./
 import { Badge } from "./ui/badge";
 import { motion } from "motion/react";
 import { useState } from "react";
+import { submitInquiry } from "../hooks/useInquiries";
 
 export function Contact() {
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
@@ -41,7 +42,16 @@ export function Contact() {
     setFormStatus('sending');
     
     try {
-      // Using EmailJS to send the form data
+      // Save to admin dashboard
+      await submitInquiry({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || null,
+        budget: formData.budget || null,
+        service: formData.service || null,
+        message: formData.message,
+      });
+
       const response = await fetch('https://formspree.io/f/mgvqqopy', {
         method: 'POST',
         headers: {

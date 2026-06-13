@@ -6,6 +6,7 @@ import type { ClientStatus } from "../../lib/types/database";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
+import { Input } from "../../components/ui/input";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -29,6 +30,17 @@ export function AdminClientsPage() {
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const filtered = clients.filter((c) => {
+    const q = search.toLowerCase();
+    return (
+      !q ||
+      c.name.toLowerCase().includes(q) ||
+      (c.email?.toLowerCase().includes(q) ?? false) ||
+      (c.company?.toLowerCase().includes(q) ?? false)
+    );
+  });
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -64,7 +76,14 @@ export function AdminClientsPage() {
         </Link>
       </div>
 
-      {clients.length === 0 ? (
+      <Input
+        placeholder="Search clients…"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="bg-white/5 border-white/10 text-white max-w-sm mb-6"
+      />
+
+      {filtered.length === 0 ? (
         <Card className="bg-white/5 border-white/10 p-12 text-center">
           <p className="text-gray-400 mb-4">No clients yet. Add your first client or lead.</p>
           <Link to="/admin/clients/new">
@@ -73,7 +92,7 @@ export function AdminClientsPage() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {clients.map((client) => (
+          {filtered.map((client) => (
             <Card
               key={client.id}
               className="bg-white/5 border-white/10 p-4 flex flex-col sm:flex-row sm:items-center gap-4"

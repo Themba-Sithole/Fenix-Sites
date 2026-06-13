@@ -32,6 +32,12 @@ const AdminClientsPage = lazy(() =>
 const AdminClientFormPage = lazy(() =>
   import("./pages/admin/AdminClientFormPage").then((m) => ({ default: m.AdminClientFormPage }))
 );
+const AdminInquiriesPage = lazy(() =>
+  import("./pages/admin/AdminInquiriesPage").then((m) => ({ default: m.AdminInquiriesPage }))
+);
+const AdminAnalyticsPage = lazy(() =>
+  import("./pages/admin/AdminAnalyticsPage").then((m) => ({ default: m.AdminAnalyticsPage }))
+);
 
 function AdminFallback() {
   return (
@@ -83,6 +89,8 @@ export default function App() {
                 <Route path="clients" element={<AdminClientsPage />} />
                 <Route path="clients/new" element={<AdminClientFormPage />} />
                 <Route path="clients/:id" element={<AdminClientFormPage />} />
+                <Route path="inquiries" element={<AdminInquiriesPage />} />
+                <Route path="analytics" element={<AdminAnalyticsPage />} />
               </Route>
               <Route path="/*" element={<PublicLayout />} />
             </Routes>

@@ -5,6 +5,7 @@ import { useProjects } from "../../hooks/useProjects";
 import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
+import { Input } from "../../components/ui/input";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,6 +22,12 @@ export function AdminProjectsPage() {
   const navigate = useNavigate();
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const filtered = projects.filter((p) => {
+    const q = search.toLowerCase();
+    return !q || p.title.toLowerCase().includes(q) || p.category.toLowerCase().includes(q);
+  });
 
   const handleDelete = async () => {
     if (!deleteId) return;
@@ -64,7 +71,14 @@ export function AdminProjectsPage() {
         </Link>
       </div>
 
-      {projects.length === 0 ? (
+      <Input
+        placeholder="Search projects…"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="bg-white/5 border-white/10 text-white max-w-sm mb-6"
+      />
+
+      {filtered.length === 0 ? (
         <Card className="bg-white/5 border-white/10 p-12 text-center">
           <p className="text-gray-400 mb-4">No projects yet. Add your first portfolio piece.</p>
           <Link to="/admin/projects/new">
@@ -73,7 +87,7 @@ export function AdminProjectsPage() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {projects.map((project) => (
+          {filtered.map((project) => (
             <Card
               key={project.id}
               className="bg-white/5 border-white/10 p-4 flex flex-col sm:flex-row sm:items-center gap-4"

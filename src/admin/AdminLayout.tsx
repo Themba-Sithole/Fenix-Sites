@@ -6,18 +6,25 @@ import {
   LogOut,
   ExternalLink,
   Flame,
+  Inbox,
+  BarChart3,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useInquiries } from "../hooks/useInquiries";
 import { Button } from "../components/ui/button";
+import { Badge } from "../components/ui/badge";
 
 const navItems = [
   { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
   { to: "/admin/projects", label: "Projects", icon: FolderKanban },
   { to: "/admin/clients", label: "Clients", icon: Users },
+  { to: "/admin/inquiries", label: "Inquiries", icon: Inbox, badge: true },
+  { to: "/admin/analytics", label: "Analytics", icon: BarChart3 },
 ];
 
 export function AdminLayout() {
   const { signOut, user } = useAuth();
+  const { newCount } = useInquiries();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -33,25 +40,32 @@ export function AdminLayout() {
             <Flame className="w-5 h-5 text-[#db7d30]" />
             <span className="text-white font-semibold">FenixSites</span>
           </div>
-          <p className="text-xs text-gray-500">Admin Panel</p>
+          <p className="text-xs text-gray-500">Agency Command Center</p>
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
-          {navItems.map(({ to, label, icon: Icon, end }) => (
+          {navItems.map(({ to, label, icon: Icon, end, badge }) => (
             <NavLink
               key={to}
               to={to}
               end={end}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors ${
+                `flex items-center justify-between px-3 py-2.5 rounded-lg text-sm transition-colors ${
                   isActive
                     ? "bg-[#cd3f2c]/20 text-white border border-[#cd3f2c]/30"
                     : "text-gray-400 hover:text-white hover:bg-white/5"
                 }`
               }
             >
-              <Icon className="w-4 h-4" />
-              {label}
+              <span className="flex items-center gap-3">
+                <Icon className="w-4 h-4" />
+                {label}
+              </span>
+              {badge && newCount > 0 && (
+                <Badge className="bg-[#cd3f2c] text-white border-0 text-[10px] h-5 min-w-5 px-1.5">
+                  {newCount}
+                </Badge>
+              )}
             </NavLink>
           ))}
         </nav>
@@ -78,8 +92,8 @@ export function AdminLayout() {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-auto">
-        <div className="p-6 md:p-8 max-w-6xl">
+      <main className="flex-1 overflow-auto bg-gray-950">
+        <div className="p-6 md:p-8 max-w-7xl">
           <Outlet />
         </div>
       </main>
