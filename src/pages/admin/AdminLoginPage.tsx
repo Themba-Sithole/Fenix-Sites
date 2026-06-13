@@ -7,20 +7,24 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Card } from "../../components/ui/card";
 
+const ADMIN_EMAIL = "tjsgamerspro1@gmail.com";
+
 export function AdminLoginPage() {
-  const { signIn, user } = useAuth();
+  const { signIn, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? "/admin";
 
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(ADMIN_EMAIL);
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (user) navigate(from, { replace: true });
-  }, [user, from, navigate]);
+    if (!authLoading && user) {
+      navigate(from, { replace: true });
+    }
+  }, [user, authLoading, from, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,6 +42,14 @@ export function AdminLoginPage() {
     navigate(from, { replace: true });
   };
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-[#db7d30] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-black/80 border-white/10 p-8">
@@ -50,9 +62,11 @@ export function AdminLoginPage() {
         </div>
 
         {!isSupabaseConfigured && (
-          <div className="mb-6 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-200 text-sm">
-            Supabase is not configured. Add <code className="text-amber-100">VITE_SUPABASE_URL</code> and{" "}
-            <code className="text-amber-100">VITE_SUPABASE_ANON_KEY</code> to <code className="text-amber-100">.env.local</code>.
+          <div className="mb-6 p-4 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-200 text-sm leading-relaxed">
+            <strong className="block text-amber-100 mb-1">Supabase not configured</strong>
+            Add <code className="text-amber-100">VITE_SUPABASE_URL</code> and{" "}
+            <code className="text-amber-100">VITE_SUPABASE_ANON_KEY</code> in{" "}
+            <strong>Vercel → Settings → Environment Variables</strong>, then redeploy.
           </div>
         )}
 
@@ -65,8 +79,8 @@ export function AdminLoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              autoComplete="email"
               className="mt-1.5 bg-white/5 border-white/10 text-white"
-              placeholder="you@fenixsites.co.za"
             />
           </div>
           <div>
@@ -77,12 +91,13 @@ export function AdminLoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              autoComplete="current-password"
               className="mt-1.5 bg-white/5 border-white/10 text-white"
             />
           </div>
 
           {error && (
-            <p className="text-red-400 text-sm">{error}</p>
+            <p className="text-red-400 text-sm leading-relaxed">{error}</p>
           )}
 
           <Button

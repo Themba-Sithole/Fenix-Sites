@@ -48,21 +48,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     if (!supabase) {
-      return { error: "Supabase is not configured. Add your keys to .env.local." };
+      return {
+        error:
+          "Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your environment variables (Vercel → Settings → Environment Variables).",
+      };
     }
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error?.message ?? null };
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    });
+
+    if (error) {
+      if (error.message.toLowerCase().includes("email not confirmed")) {
+        return {
+          error:
+            "Email not confirmed. Disable “Confirm email” in Supabase → Authentication → Providers → Email, or confirm your email from the inbox.",
+        };
+      }
+      return { error: error.message };
+    }
+
+    if (data.session) {
+      setSession(data.session);
+      setUser(data.session.user);
+    }
+
+    return { error: null };
   };
 
   const signOut = async () => {
     if (supabase) await supabase.auth.signOut();
+    setSession(null);
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, session, loading, signIn, signOut }}
-    >
+    <AuthContext.Provider value={{ user, session, loading, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   );

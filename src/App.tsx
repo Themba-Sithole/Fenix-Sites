@@ -1,21 +1,45 @@
+import { lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./admin/ProtectedRoute";
-import { AdminLayout } from "./admin/AdminLayout";
 import { HomePage } from "./pages/HomePage";
 import { ServicesPage } from "./pages/ServicesPage";
 import { PortfolioPage } from "./pages/PortfolioPage";
 import { AboutPage } from "./pages/AboutPage";
 import { ContactPage } from "./pages/ContactPage";
-import { AdminLoginPage } from "./pages/admin/AdminLoginPage";
-import { AdminDashboardPage } from "./pages/admin/AdminDashboardPage";
-import { AdminProjectsPage } from "./pages/admin/AdminProjectsPage";
-import { AdminProjectFormPage } from "./pages/admin/AdminProjectFormPage";
-import { AdminClientsPage } from "./pages/admin/AdminClientsPage";
-import { AdminClientFormPage } from "./pages/admin/AdminClientFormPage";
+
+const AdminLayout = lazy(() =>
+  import("./admin/AdminLayout").then((m) => ({ default: m.AdminLayout }))
+);
+const AdminLoginPage = lazy(() =>
+  import("./pages/admin/AdminLoginPage").then((m) => ({ default: m.AdminLoginPage }))
+);
+const AdminDashboardPage = lazy(() =>
+  import("./pages/admin/AdminDashboardPage").then((m) => ({ default: m.AdminDashboardPage }))
+);
+const AdminProjectsPage = lazy(() =>
+  import("./pages/admin/AdminProjectsPage").then((m) => ({ default: m.AdminProjectsPage }))
+);
+const AdminProjectFormPage = lazy(() =>
+  import("./pages/admin/AdminProjectFormPage").then((m) => ({ default: m.AdminProjectFormPage }))
+);
+const AdminClientsPage = lazy(() =>
+  import("./pages/admin/AdminClientsPage").then((m) => ({ default: m.AdminClientsPage }))
+);
+const AdminClientFormPage = lazy(() =>
+  import("./pages/admin/AdminClientFormPage").then((m) => ({ default: m.AdminClientFormPage }))
+);
+
+function AdminFallback() {
+  return (
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-[#db7d30] border-t-transparent rounded-full animate-spin" />
+    </div>
+  );
+}
 
 function PublicLayout() {
   return (
@@ -41,26 +65,28 @@ export default function App() {
       <Router>
         <ScrollToTop />
         <div className="dark min-h-screen bg-black">
-          <Routes>
-            <Route path="/admin/login" element={<AdminLoginPage />} />
-            <Route
-              path="/admin/*"
-              element={
-                <ProtectedRoute>
-                  <AdminLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<AdminDashboardPage />} />
-              <Route path="projects" element={<AdminProjectsPage />} />
-              <Route path="projects/new" element={<AdminProjectFormPage />} />
-              <Route path="projects/:id" element={<AdminProjectFormPage />} />
-              <Route path="clients" element={<AdminClientsPage />} />
-              <Route path="clients/new" element={<AdminClientFormPage />} />
-              <Route path="clients/:id" element={<AdminClientFormPage />} />
-            </Route>
-            <Route path="/*" element={<PublicLayout />} />
-          </Routes>
+          <Suspense fallback={<AdminFallback />}>
+            <Routes>
+              <Route path="/admin/login" element={<AdminLoginPage />} />
+              <Route
+                path="/admin/*"
+                element={
+                  <ProtectedRoute>
+                    <AdminLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<AdminDashboardPage />} />
+                <Route path="projects" element={<AdminProjectsPage />} />
+                <Route path="projects/new" element={<AdminProjectFormPage />} />
+                <Route path="projects/:id" element={<AdminProjectFormPage />} />
+                <Route path="clients" element={<AdminClientsPage />} />
+                <Route path="clients/new" element={<AdminClientFormPage />} />
+                <Route path="clients/:id" element={<AdminClientFormPage />} />
+              </Route>
+              <Route path="/*" element={<PublicLayout />} />
+            </Routes>
+          </Suspense>
         </div>
       </Router>
     </AuthProvider>

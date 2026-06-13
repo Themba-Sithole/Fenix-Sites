@@ -1,166 +1,125 @@
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { Button } from "./ui/button";
-import { motion, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
+import { motion } from "motion/react";
+import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
 import { brand, valueProps } from "../lib/content";
-import { BrowserFrame } from "./ui/BrowserFrame";
-import { fadeInUp, slideInLeft, slideInRight, staggerContainer } from "../lib/motion";
-import { usePublicProjects } from "../hooks/usePublicProjects";
+import { fadeInUp, staggerContainer } from "../lib/motion";
+
+const HeroSpline = lazy(() =>
+  import("./HeroSpline").then((m) => ({ default: m.HeroSpline }))
+);
 
 export function Hero() {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [0, 120]);
-  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
-
-  const { projects } = usePublicProjects({ featuredOnly: true });
-  const previewImages = projects.slice(0, 2);
-
   return (
     <section
-      ref={ref}
       id="home"
-      className="relative min-h-[100svh] flex items-center overflow-hidden bg-[#030303] pt-24 pb-16"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black pt-20"
     >
-      {/* Ambient background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-10%,rgba(205,63,44,0.18),transparent)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_100%_50%,rgba(219,125,48,0.08),transparent)]" />
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)",
-            backgroundSize: "64px 64px",
-          }}
+      {/* Spline 3D — lazy loaded for performance */}
+      <div className="absolute inset-0 w-full h-full opacity-45">
+        <Suspense
+          fallback={
+            <div className="w-full h-full bg-gradient-to-br from-[#cd3f2c]/10 via-black to-[#db7d30]/10 animate-pulse" />
+          }
+        >
+          <HeroSpline />
+        </Suspense>
+      </div>
+
+      <div className="absolute bottom-0 left-0 right-0 h-56 bg-gradient-to-t from-black via-black/90 to-transparent z-[5]" />
+
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-[1]">
+        <motion.div
+          className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#cd3f2c]/15 rounded-full blur-3xl"
+          animate={{ scale: [1, 1.2, 1], opacity: [0.15, 0.25, 0.15] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#db7d30]/15 rounded-full blur-3xl"
+          animate={{ scale: [1.1, 1, 1.1], opacity: [0.2, 0.12, 0.2] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
         />
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Copy */}
+        <motion.div
+          className="max-w-4xl mx-auto text-center"
+          initial="hidden"
+          animate="visible"
+          variants={staggerContainer(0.1, 0.1)}
+        >
           <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer(0.1, 0.15)}
+            variants={fadeInUp}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/15 backdrop-blur-md mb-8"
           >
-            <motion.div variants={slideInLeft}>
-              <span className="inline-flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-[#edcca5] mb-8">
-                <span className="w-2 h-2 rounded-full bg-[#db7d30] animate-pulse" />
-                {brand.tagline}
-              </span>
-            </motion.div>
-
-            <motion.h1
-              variants={slideInLeft}
-              className="text-white text-[2.5rem] sm:text-5xl md:text-6xl lg:text-[3.5rem] font-bold leading-[1.05] tracking-tight mb-6"
-            >
-              {brand.headline}{" "}
-              <span className="relative">
-                <span className="bg-gradient-to-r from-[#cd3f2c] via-[#db7d30] to-[#edcca5] bg-clip-text text-transparent">
-                  {brand.headlineAccent}
-                </span>
-                <motion.span
-                  className="absolute -bottom-1 left-0 h-[3px] bg-gradient-to-r from-[#cd3f2c] to-[#db7d30] rounded-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: "100%" }}
-                  transition={{ duration: 1, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                />
-              </span>
-            </motion.h1>
-
-            <motion.p
-              variants={slideInLeft}
-              className="text-gray-400 text-lg leading-relaxed mb-10 max-w-lg"
-            >
-              {brand.description}
-            </motion.p>
-
-            <motion.div variants={slideInLeft} className="flex flex-wrap gap-4 mb-14">
-              <Link to="/contact">
-                <Button
-                  size="lg"
-                  className="group h-12 px-7 bg-white text-black hover:bg-gray-100 font-medium rounded-full"
-                >
-                  {brand.cta.primary}
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                </Button>
-              </Link>
-              <Link to="/portfolio">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="h-12 px-7 border-white/20 text-white hover:bg-white/5 rounded-full backdrop-blur-sm"
-                >
-                  {brand.cta.secondary}
-                  <ArrowUpRight className="ml-2 w-4 h-4" />
-                </Button>
-              </Link>
-            </motion.div>
-
-            <motion.div
-              variants={staggerContainer(0.08, 0.3)}
-              className="flex flex-wrap gap-8 pt-8 border-t border-white/[0.08]"
-            >
-              {valueProps.map((prop) => (
-                <motion.div key={prop.label} variants={fadeInUp}>
-                  <p className="text-2xl font-bold text-white mb-0.5">{prop.value}</p>
-                  <p className="text-sm text-gray-300">{prop.label}</p>
-                  <p className="text-xs text-gray-500">{prop.detail}</p>
-                </motion.div>
-              ))}
-            </motion.div>
+            <Sparkles className="w-4 h-4 text-[#edcca5]" />
+            <span className="text-sm text-gray-200">{brand.tagline}</span>
           </motion.div>
 
-          {/* Visual showcase */}
-          <motion.div style={{ y, opacity }} className="relative hidden lg:block">
-            <motion.div
-              initial="hidden"
-              animate="visible"
-              variants={staggerContainer(0.15, 0.4)}
-              className="relative"
+          <motion.h1
+            variants={fadeInUp}
+            className="text-white text-4xl sm:text-5xl md:text-6xl font-bold mb-6 leading-[1.08] tracking-tight"
+            style={{ textShadow: "0 4px 30px rgba(0,0,0,0.8)" }}
+          >
+            {brand.headline}{" "}
+            <motion.span
+              className="bg-gradient-to-r from-[#cd3f2c] via-[#db7d30] to-[#edcca5] bg-clip-text text-transparent"
+              animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+              transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
+              style={{ backgroundSize: "200% 200%" }}
             >
-              <div className="absolute -inset-8 bg-gradient-to-br from-[#cd3f2c]/20 via-transparent to-[#db7d30]/10 rounded-3xl blur-3xl" />
+              {brand.headlineAccent}
+            </motion.span>
+          </motion.h1>
 
-              {previewImages[0] && (
-                <motion.div variants={slideInRight} className="relative z-10">
-                  <BrowserFrame
-                    image={previewImages[0].image}
-                    title={previewImages[0].title}
-                    url="client-store.co.za"
-                  />
-                </motion.div>
-              )}
+          <motion.p
+            variants={fadeInUp}
+            className="text-gray-300 text-lg md:text-xl mb-10 max-w-2xl mx-auto leading-relaxed"
+            style={{ textShadow: "0 2px 16px rgba(0,0,0,0.7)" }}
+          >
+            {brand.description}
+          </motion.p>
 
-              {previewImages[1] && (
-                <motion.div
-                  variants={slideInRight}
-                  className="absolute -bottom-12 -left-8 w-[75%] z-20"
-                  animate={{ y: [0, -8, 0] }}
-                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                >
-                  <BrowserFrame
-                    image={previewImages[1].image}
-                    title={previewImages[1].title}
-                    url="startup-launch.com"
-                    delay={0.2}
-                  />
-                </motion.div>
-              )}
-
-              {/* Floating quality badge */}
-              <motion.div
-                className="absolute -top-4 -right-4 z-30 px-4 py-3 rounded-2xl bg-black/80 border border-white/10 backdrop-blur-xl"
-                animate={{ y: [0, 6, 0] }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+          <motion.div
+            variants={fadeInUp}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16"
+          >
+            <Link to="/contact">
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-[#cd3f2c] to-[#db7d30] hover:from-[#b33624] hover:to-[#c56d28] min-w-[220px] h-12 shadow-lg shadow-[#cd3f2c]/20"
               >
-                <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">Performance</p>
-                <p className="text-white font-semibold">98 Lighthouse</p>
-              </motion.div>
-            </motion.div>
+                {brand.cta.primary}
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </Link>
+            <Link to="/portfolio">
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-white/25 text-white hover:bg-white/10 min-w-[220px] h-12 bg-black/30 backdrop-blur-sm"
+              >
+                {brand.cta.secondary}
+              </Button>
+            </Link>
           </motion.div>
-        </div>
+
+          <motion.div
+            variants={staggerContainer(0.08, 0.2)}
+            className="grid grid-cols-3 gap-6 max-w-2xl mx-auto pt-10 border-t border-white/10"
+          >
+            {valueProps.map((prop) => (
+              <motion.div key={prop.label} variants={fadeInUp} className="text-center">
+                <p className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-[#cd3f2c] to-[#db7d30] bg-clip-text text-transparent mb-1">
+                  {prop.value}
+                </p>
+                <p className="text-white text-sm font-medium">{prop.label}</p>
+                <p className="text-gray-500 text-xs">{prop.detail}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </motion.div>
       </div>
     </section>
   );

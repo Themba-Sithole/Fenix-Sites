@@ -54,6 +54,15 @@
     build: {
       target: 'esnext',
       outDir: 'build',
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            spline: ['@splinetool/react-spline'],
+            supabase: ['@supabase/supabase-js'],
+            motion: ['motion'],
+          },
+        },
+      },
     },
     server: {
       port: 3000,

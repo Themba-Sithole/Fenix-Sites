@@ -1,13 +1,13 @@
 export const brand = {
   name: "FenixSites",
-  tagline: "Premium web design studio",
-  headline: "We build websites that feel",
-  headlineAccent: "expensive.",
+  tagline: "Premium Web Design Agency",
+  headline: "We craft digital experiences that",
+  headlineAccent: "convert.",
   description:
-    "Pixel-perfect design, buttery-smooth interactions, and code that performs. Every site we ship is built to impress your customers and convert.",
+    "Stunning design, flawless code, and lightning-fast performance — built for South African businesses ready to stand out online.",
   cta: {
     primary: "Start Your Project",
-    secondary: "See Our Work",
+    secondary: "View Our Work",
   },
   contactNote: "Free consultation · Response within 24 hours",
 } as const;
@@ -19,14 +19,12 @@ export const qualitySignals = [
   "Fast Loading",
   "E-Commerce",
   "Brand Identity",
-  "UI/UX",
-  "24/7 Support",
 ] as const;
 
 export const valueProps = [
-  { value: "100%", label: "Custom built", detail: "No templates" },
-  { value: "<2s", label: "Load time", detail: "Performance first" },
-  { value: "5★", label: "Client rating", detail: "Every project" },
+  { value: "100%", label: "Custom Built", detail: "No templates" },
+  { value: "<2s", label: "Load Time", detail: "Optimized" },
+  { value: "5★", label: "Rated", detail: "By clients" },
 ] as const;
 
 export const coreServices = [
@@ -34,25 +32,21 @@ export const coreServices = [
     icon: "Code2" as const,
     title: "Websites & Landing Pages",
     description: "Bespoke sites engineered for speed, clarity, and conversion.",
-    featured: true,
   },
   {
     icon: "ShoppingCart" as const,
-    title: "E-Commerce",
-    description: "Beautiful stores with seamless checkout experiences.",
-    featured: false,
+    title: "E-Commerce Stores",
+    description: "Beautiful online shops with seamless checkout experiences.",
   },
   {
     icon: "Palette" as const,
-    title: "Brand & Design",
+    title: "Branding & Design",
     description: "Visual identity that makes your business unforgettable.",
-    featured: false,
   },
   {
     icon: "TrendingUp" as const,
     title: "SEO & Growth",
-    description: "Get discovered and turn visitors into paying customers.",
-    featured: false,
+    description: "Get discovered on Google and turn visitors into customers.",
   },
 ] as const;
 
@@ -60,17 +54,17 @@ export const processSteps = [
   {
     step: "01",
     title: "Discovery",
-    description: "We learn your brand, audience, and goals — then map the perfect solution.",
+    description: "We learn your brand, goals, and audience — then map the perfect solution.",
   },
   {
     step: "02",
-    title: "Design & Craft",
-    description: "Every pixel, animation, and interaction is refined until it's flawless.",
+    title: "Design & Build",
+    description: "Every pixel and interaction refined until the experience feels premium.",
   },
   {
     step: "03",
-    title: "Launch & Support",
-    description: "We deploy, optimize, and stay with you so your site keeps performing.",
+    title: "Launch",
+    description: "We go live, optimize performance, and support you from day one.",
   },
 ] as const;
 
@@ -81,8 +75,7 @@ export const testimonials = [
     project: "E-Commerce Website",
     avatar: "SM",
     rating: 5,
-    text: "FenixSites didn't just build us a website — they built us a brand experience. Our online store looks incredible and sales are already coming through.",
-    featured: true,
+    text: "FenixSites created a beautiful online store for my boutique. The design is modern and easy for customers to use — I'm already seeing sales come through online.",
   },
   {
     name: "Michael Chen",
@@ -90,7 +83,6 @@ export const testimonials = [
     project: "Landing Page",
     avatar: "MC",
     rating: 5,
-    text: "The attention to detail is unreal. Animations, mobile experience, load speed — everything feels premium. Exactly what our startup needed.",
-    featured: false,
+    text: "They delivered my startup's landing page quickly and it looks fantastic. The team understood what I needed and brought my vision to life.",
   },
 ] as const;

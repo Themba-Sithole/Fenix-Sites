@@ -63,6 +63,7 @@
             "build": "node node_modules/vite/bin/vite.js build",
             "preview": "vite preview",
           "setup:admin": "node scripts/setup-admin.mjs",
-          "setup:db": "node scripts/setup-database.mjs"
+          "setup:db": "node scripts/setup-database.mjs",
+          "confirm:admin": "node scripts/confirm-admin-email.mjs"
       }
 }
