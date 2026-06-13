@@ -1,71 +1,63 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Button } from "./ui/button";
 import { motion } from "motion/react";
 import { Link } from "react-router-dom";
-import { SectionBackground } from "./ui/SectionBackground";
 import { brand } from "../lib/content";
-import { fadeInUp, viewportOnce } from "../lib/motion";
+import { scaleIn, viewportOnce } from "../lib/motion";
 
 export function CTASection() {
   return (
-    <section className="py-20 md:py-28 bg-gradient-to-b from-gray-950 to-black relative overflow-hidden">
-      <SectionBackground />
-
+    <section className="py-24 md:py-32 bg-[#030303] relative overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
-          className="max-w-2xl mx-auto text-center"
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
-          variants={fadeInUp}
+          variants={scaleIn}
+          className="relative max-w-4xl mx-auto"
         >
-          <h2 className="text-white text-2xl md:text-3xl mb-4">
-            Ready to get your business online?
-          </h2>
-          <p className="text-gray-400 mb-8">
-            Tell us about your project and we&apos;ll get back to you with a clear plan and quote — no pressure, no obligation.
-          </p>
+          {/* Glow */}
+          <div className="absolute -inset-px rounded-3xl bg-gradient-to-r from-[#cd3f2c]/40 via-[#db7d30]/20 to-[#edcca5]/30 blur-sm" />
 
-          <motion.div
-            className="flex flex-col sm:flex-row gap-4 justify-center"
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={viewportOnce}
-            transition={{ delay: 0.15, duration: 0.5 }}
-          >
-            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-              <Link to="/contact">
-                <Button
-                  size="lg"
-                  className="bg-gradient-to-r from-[#cd3f2c] to-[#db7d30] hover:from-[#b33624] hover:to-[#c56d28] min-w-[220px]"
-                >
-                  {brand.cta.primary}
-                  <ArrowRight className="ml-2 w-4 h-4" />
-                </Button>
-              </Link>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>
-              <Link to="/services">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-white/25 text-white hover:bg-white/10 min-w-[220px]"
-                >
-                  See Pricing
-                </Button>
-              </Link>
-            </motion.div>
-          </motion.div>
+          <div className="relative rounded-3xl border border-white/10 bg-black p-10 md:p-16 text-center overflow-hidden">
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(205,63,44,0.08),transparent_60%)]" />
 
-          <motion.p
-            className="text-sm text-gray-500 mt-6"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={viewportOnce}
-            transition={{ delay: 0.3 }}
-          >
-            {brand.contactNote}
-          </motion.p>
+            <div className="relative z-10">
+              <p className="text-[#edcca5] text-xs uppercase tracking-[0.2em] mb-6">
+                Let&apos;s build something remarkable
+              </p>
+              <h2 className="text-white text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight mb-5 leading-tight">
+                Your next website should be your best salesperson.
+              </h2>
+              <p className="text-gray-400 text-lg mb-10 max-w-xl mx-auto">
+                Tell us about your project. We&apos;ll respond within 24 hours with a clear plan — no pressure, no jargon.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Link to="/contact">
+                  <Button
+                    size="lg"
+                    className="h-12 px-8 bg-white text-black hover:bg-gray-100 rounded-full font-medium"
+                  >
+                    {brand.cta.primary}
+                    <ArrowRight className="ml-2 w-4 h-4" />
+                  </Button>
+                </Link>
+                <Link to="/services">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="h-12 px-8 border-white/20 text-white hover:bg-white/5 rounded-full"
+                  >
+                    View Pricing
+                    <ArrowUpRight className="ml-2 w-4 h-4" />
+                  </Button>
+                </Link>
+              </div>
+
+              <p className="text-gray-600 text-sm mt-8">{brand.contactNote}</p>
+            </div>
+          </div>
         </motion.div>
       </div>
     </section>

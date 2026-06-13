@@ -6,29 +6,44 @@ type SectionHeaderProps = {
   title: string;
   description?: string;
   align?: "center" | "left";
+  large?: boolean;
 };
 
 export function SectionHeader({
   eyebrow,
   title,
   description,
-  align = "center",
+  align = "left",
+  large = false,
 }: SectionHeaderProps) {
-  const alignClass = align === "center" ? "text-center mx-auto" : "text-left";
+  const alignClass = align === "center" ? "text-center mx-auto items-center" : "text-left items-start";
 
   return (
     <motion.div
-      className={`max-w-2xl mb-14 md:mb-16 ${alignClass}`}
+      className={`flex flex-col max-w-3xl mb-16 md:mb-20 ${alignClass}`}
       initial="hidden"
       whileInView="visible"
       viewport={viewportOnce}
       variants={fadeInUp}
     >
-      <span className="text-[#edcca5] uppercase tracking-wider text-sm mb-3 block">
-        {eyebrow}
-      </span>
-      <h2 className="text-white text-2xl md:text-3xl mb-3">{title}</h2>
-      {description && <p className="text-gray-400">{description}</p>}
+      <div className="flex items-center gap-3 mb-5">
+        <span className="w-8 h-px bg-gradient-to-r from-[#cd3f2c] to-[#db7d30]" />
+        <span className="text-[#edcca5] uppercase tracking-[0.2em] text-xs font-medium">
+          {eyebrow}
+        </span>
+      </div>
+      <h2
+        className={`text-white font-semibold leading-[1.1] tracking-tight mb-4 ${
+          large ? "text-3xl sm:text-4xl md:text-5xl" : "text-2xl sm:text-3xl md:text-4xl"
+        }`}
+      >
+        {title}
+      </h2>
+      {description && (
+        <p className="text-gray-400 text-base md:text-lg leading-relaxed max-w-2xl">
+          {description}
+        </p>
+      )}
     </motion.div>
   );
 }

@@ -1,59 +1,76 @@
 export const brand = {
   name: "FenixSites",
-  tagline: "Web design & development for South African businesses",
+  tagline: "Premium web design studio",
+  headline: "We build websites that feel",
+  headlineAccent: "expensive.",
   description:
-    "We build fast, modern websites that help your business look professional online — from landing pages to full e-commerce stores.",
+    "Pixel-perfect design, buttery-smooth interactions, and code that performs. Every site we ship is built to impress your customers and convert.",
   cta: {
-    primary: "Get a Free Consultation",
-    secondary: "View Our Work",
+    primary: "Start Your Project",
+    secondary: "See Our Work",
   },
   contactNote: "Free consultation · Response within 24 hours",
 } as const;
 
+export const qualitySignals = [
+  "Custom Design",
+  "Mobile-First",
+  "SEO Ready",
+  "Fast Loading",
+  "E-Commerce",
+  "Brand Identity",
+  "UI/UX",
+  "24/7 Support",
+] as const;
+
 export const valueProps = [
-  { label: "Custom Design", detail: "Tailored to your brand" },
-  { label: "Mobile-First", detail: "Looks great on every device" },
-  { label: "From R 2,500", detail: "Clear, transparent pricing" },
+  { value: "100%", label: "Custom built", detail: "No templates" },
+  { value: "<2s", label: "Load time", detail: "Performance first" },
+  { value: "5★", label: "Client rating", detail: "Every project" },
 ] as const;
 
 export const coreServices = [
   {
     icon: "Code2" as const,
     title: "Websites & Landing Pages",
-    description: "Custom sites built for speed, clarity, and conversions.",
+    description: "Bespoke sites engineered for speed, clarity, and conversion.",
+    featured: true,
   },
   {
     icon: "ShoppingCart" as const,
-    title: "E-Commerce Stores",
-    description: "Online shops with payments, products, and order management.",
+    title: "E-Commerce",
+    description: "Beautiful stores with seamless checkout experiences.",
+    featured: false,
   },
   {
     icon: "Palette" as const,
-    title: "Branding & Design",
-    description: "Logos, UI/UX, and visuals that match your business.",
+    title: "Brand & Design",
+    description: "Visual identity that makes your business unforgettable.",
+    featured: false,
   },
   {
     icon: "TrendingUp" as const,
     title: "SEO & Growth",
-    description: "Get found on Google and connect with more customers.",
+    description: "Get discovered and turn visitors into paying customers.",
+    featured: false,
   },
 ] as const;
 
 export const processSteps = [
   {
     step: "01",
-    title: "Consult",
-    description: "Tell us about your business, goals, and budget. We'll recommend the right package.",
+    title: "Discovery",
+    description: "We learn your brand, audience, and goals — then map the perfect solution.",
   },
   {
     step: "02",
-    title: "Design & Build",
-    description: "We design, develop, and refine your site until you're happy with every detail.",
+    title: "Design & Craft",
+    description: "Every pixel, animation, and interaction is refined until it's flawless.",
   },
   {
     step: "03",
-    title: "Launch",
-    description: "We go live, set up hosting, and provide support so you're ready from day one.",
+    title: "Launch & Support",
+    description: "We deploy, optimize, and stay with you so your site keeps performing.",
   },
 ] as const;
 
@@ -64,7 +81,8 @@ export const testimonials = [
     project: "E-Commerce Website",
     avatar: "SM",
     rating: 5,
-    text: "FenixSites created a beautiful online store for my boutique. The design is modern and easy for customers to use — I'm already seeing sales come through online.",
+    text: "FenixSites didn't just build us a website — they built us a brand experience. Our online store looks incredible and sales are already coming through.",
+    featured: true,
   },
   {
     name: "Michael Chen",
@@ -72,23 +90,7 @@ export const testimonials = [
     project: "Landing Page",
     avatar: "MC",
     rating: 5,
-    text: "They delivered my startup's landing page quickly and it looks fantastic. The team understood what I needed and brought my vision to life.",
-  },
-] as const;
-
-export const featuredWork = [
-  {
-    title: "Boutique E-Commerce Store",
-    category: "E-Commerce",
-    description: "A clean online store with product catalog, checkout, and mobile-friendly shopping.",
-    image:
-      "https://images.unsplash.com/photo-1680499661732-3cfae4690e1c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjB3ZWIlMjBkZXNpZ258ZW58MXx8fHwxNzYyODc5NDQwfDA&ixlib=rb-4.1.0&q=80&w=1080",
-  },
-  {
-    title: "Startup Landing Page",
-    category: "Landing Page",
-    description: "A high-converting single-page site built for a fast-moving tech startup launch.",
-    image:
-      "https://images.unsplash.com/photo-1597534458220-9fb4969f2df5?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtaW5pbWFsJTIwd2Vic2l0ZXxlbnwxfHx8fDE3NjI4ODc5ODd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+    text: "The attention to detail is unreal. Animations, mobile experience, load speed — everything feels premium. Exactly what our startup needed.",
+    featured: false,
   },
 ] as const;

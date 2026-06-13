@@ -1,44 +1,40 @@
 import { motion } from "motion/react";
 import { SectionHeader } from "./ui/SectionHeader";
-import { SectionBackground } from "./ui/SectionBackground";
 import { processSteps } from "../lib/content";
 import { fadeInUp, staggerContainer, viewportOnce } from "../lib/motion";
 
 export function HowItWorks() {
   return (
-    <section className="py-20 md:py-28 bg-gradient-to-b from-black to-gray-950 relative overflow-hidden">
-      <SectionBackground variant="warm" />
+    <section className="py-24 md:py-32 bg-[#030303] relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_50%_40%_at_50%_100%,rgba(219,125,48,0.06),transparent)]" />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <SectionHeader
-          eyebrow="How It Works"
-          title="From idea to live website in three steps"
-          description="A simple, transparent process — no surprises."
+          eyebrow="Our Process"
+          title="Precision at every stage"
+          description="A refined workflow that keeps you informed and delivers on time."
+          align="center"
+          large
         />
 
         <motion.div
-          className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto"
+          className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto relative"
           initial="hidden"
           whileInView="visible"
           viewport={viewportOnce}
-          variants={staggerContainer(0.12)}
+          variants={staggerContainer(0.15)}
         >
-          {processSteps.map((item, index) => (
+          {/* Connecting line */}
+          <div className="hidden md:block absolute top-[2.75rem] left-[16%] right-[16%] h-px bg-gradient-to-r from-transparent via-[#db7d30]/30 to-transparent" />
+
+          {processSteps.map((item) => (
             <motion.div key={item.step} variants={fadeInUp} className="relative">
-              {index < processSteps.length - 1 && (
-                <div className="hidden md:block absolute top-8 left-[calc(50%+2rem)] right-[calc(-50%+2rem)] h-px bg-gradient-to-r from-[#db7d30]/40 to-transparent" />
-              )}
-              <div className="text-center md:text-left">
-                <motion.span
-                  className="inline-block text-4xl font-bold bg-gradient-to-r from-[#cd3f2c] to-[#db7d30] bg-clip-text text-transparent mb-4"
-                  whileInView={{ opacity: [0, 1], y: [12, 0] }}
-                  viewport={viewportOnce}
-                  transition={{ duration: 0.4, delay: index * 0.1 }}
-                >
-                  {item.step}
-                </motion.span>
-                <h3 className="text-white text-lg mb-2">{item.title}</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">{item.description}</p>
+              <div className="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8 text-center hover:border-[#db7d30]/25 hover:bg-white/[0.04] transition-all duration-500 h-full">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gradient-to-br from-[#cd3f2c]/20 to-[#db7d30]/20 border border-[#db7d30]/20 mb-6 relative z-10">
+                  <span className="text-[#edcca5] font-bold text-sm">{item.step}</span>
+                </div>
+                <h3 className="text-white text-lg font-semibold mb-3">{item.title}</h3>
+                <p className="text-gray-500 text-sm leading-relaxed">{item.description}</p>
               </div>
             </motion.div>
           ))}
