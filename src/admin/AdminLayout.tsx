@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { NavLink, Outlet, useNavigate, useLocation, Link } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -110,6 +110,7 @@ function AdminShell() {
   const navigate = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const skipRouteRefetch = useRef(true);
 
   const handleSignOut = async () => {
     await signOut();
@@ -120,6 +121,15 @@ function AdminShell() {
     pageTitles[location.pathname] ??
     (location.pathname.includes("/projects/") ? "Edit Project" :
      location.pathname.includes("/clients/") ? "Edit Client" : "Admin");
+
+  // Refresh shared admin data when navigating between pages (skip initial mount)
+  useEffect(() => {
+    if (skipRouteRefetch.current) {
+      skipRouteRefetch.current = false;
+      return;
+    }
+    void refetch();
+  }, [location.pathname, refetch]);
 
   const compact = profile?.settings?.compact_sidebar;
 

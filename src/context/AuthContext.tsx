@@ -50,30 +50,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    let active = true;
+
+    const applySession = async (session: Session | null) => {
+      if (!active) return;
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        fetchProfile(session.user.id).finally(() => setLoading(false));
+        await fetchProfile(session.user.id);
       } else {
-        setLoading(false);
+        setProfile(null);
       }
+      if (active) setLoading(false);
+    };
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      void applySession(session);
     });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      } else {
-        setProfile(null);
-      }
-      setLoading(false);
+      void applySession(session);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, [fetchProfile]);
 
   const signIn = async (email: string, password: string) => {
@@ -117,11 +121,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const role = profile?.role ?? null;
 
-  const hasRole = (...roles: UserRole[]) => {
+  const hasRole = useCallback((...roles: UserRole[]) => {
     if (!role) return false;
     if (role === "super_admin") return true;
     return roles.includes(role);
-  };
+  }, [role]);
 
   return (
     <AuthContext.Provider

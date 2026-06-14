@@ -26,7 +26,7 @@ interface AdminDataContextValue {
 const AdminDataContext = createContext<AdminDataContextValue | null>(null);
 
 export function AdminDataProvider({ children }: { children: ReactNode }) {
-  const { hasRole } = useAuth();
+  const { hasRole, role, loading: authLoading } = useAuth();
   const [projects, setProjects] = useState<Project[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
@@ -35,6 +35,8 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const canViewStaffData = hasRole("super_admin", "admin", "editor", "finance", "viewer");
+  const canViewInquiries = hasRole("super_admin", "admin", "editor");
   const canViewFinance = hasRole("super_admin", "admin", "finance");
 
   const fetchAll = useCallback(
@@ -44,44 +46,85 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         return;
       }
 
+      if (authLoading || !role) return;
+
       if (isRefresh) setRefreshing(true);
       else setLoading(true);
       setError(null);
 
       try {
-        const queries = [
-          supabase
-            .from("projects")
-            .select("*, clients(id, name, company)")
-            .order("sort_order", { ascending: true })
-            .order("created_at", { ascending: false }),
-          supabase.from("clients").select("*").order("created_at", { ascending: false }),
-          supabase.from("inquiries").select("*").order("created_at", { ascending: false }),
-        ];
+        const errors: string[] = [];
 
-        if (canViewFinance) {
-          queries.push(
-            supabase
-              .from("finance_records")
-              .select("*, clients(id, name, company)")
-              .order("created_at", { ascending: false })
-              .limit(20)
+        const load = async <T,>(
+          label: string,
+          query: PromiseLike<{ data: T | null; error: { message: string } | null }>,
+          setter: (data: T) => void
+        ) => {
+          const { data, error: queryError } = await query;
+          if (queryError) {
+            errors.push(`${label}: ${queryError.message}`);
+            return;
+          }
+          setter((data ?? []) as T);
+        };
+
+        const tasks: Promise<void>[] = [];
+
+        if (canViewStaffData) {
+          tasks.push(
+            load(
+              "Projects",
+              supabase
+                .from("projects")
+                .select("*, clients(id, name, company)")
+                .order("sort_order", { ascending: true })
+                .order("created_at", { ascending: false }),
+              setProjects
+            ),
+            load(
+              "Clients",
+              supabase.from("clients").select("*").order("created_at", { ascending: false }),
+              setClients
+            )
           );
+        } else {
+          setProjects([]);
+          setClients([]);
         }
 
-        const results = await Promise.all(queries);
+        if (canViewInquiries) {
+          tasks.push(
+            load(
+              "Inquiries",
+              supabase.from("inquiries").select("*").order("created_at", { ascending: false }),
+              setInquiries
+            )
+          );
+        } else {
+          setInquiries([]);
+        }
 
-        const [projRes, clientRes, inqRes, financeRes] = results;
+        if (canViewFinance) {
+          tasks.push(
+            load(
+              "Finance",
+              supabase
+                .from("finance_records")
+                .select("*, clients(id, name, company)")
+                .order("created_at", { ascending: false })
+                .limit(20),
+              setFinanceRecords
+            )
+          );
+        } else {
+          setFinanceRecords([]);
+        }
 
-        if (projRes.error) throw projRes.error;
-        if (clientRes.error) throw clientRes.error;
-        if (inqRes.error) throw inqRes.error;
-        if (financeRes?.error) throw financeRes.error;
+        await Promise.all(tasks);
 
-        setProjects((projRes.data as Project[]) ?? []);
-        setClients((clientRes.data as Client[]) ?? []);
-        setInquiries((inqRes.data as Inquiry[]) ?? []);
-        if (financeRes) setFinanceRecords((financeRes.data as FinanceRecord[]) ?? []);
+        if (errors.length > 0) {
+          setError(errors.join(" · "));
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load dashboard data");
       } finally {
@@ -89,12 +132,17 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
         setRefreshing(false);
       }
     },
-    [canViewFinance]
+    [authLoading, role, canViewStaffData, canViewInquiries, canViewFinance]
   );
 
   useEffect(() => {
-    fetchAll();
-  }, [fetchAll]);
+    if (authLoading) return;
+    if (!role) {
+      setLoading(false);
+      return;
+    }
+    void fetchAll();
+  }, [authLoading, role, fetchAll]);
 
   const newInquiryCount = useMemo(
     () => inquiries.filter((i) => i.status === "new").length,

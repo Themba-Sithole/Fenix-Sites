@@ -56,6 +56,11 @@ export function AdminDashboardPage() {
     refetch,
   } = useAdminData();
 
+  const canViewStaffData = hasRole("super_admin", "admin", "editor", "finance", "viewer");
+  const canManageContent = hasRole("super_admin", "admin", "editor");
+  const canViewInquiries = hasRole("super_admin", "admin", "editor");
+  const canViewFinance = hasRole("super_admin", "admin", "finance");
+
   const stats = useMemo(() => {
     const published = projects.filter((p) => p.published).length;
     const drafts = projects.filter((p) => !p.published).length;
@@ -152,7 +157,7 @@ export function AdminDashboardPage() {
             <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? "animate-spin" : ""}`} />
             Refresh
           </Button>
-          {hasRole("super_admin", "admin", "editor") && (
+          {canManageContent && (
             <>
               <Link to="/admin/projects/new">
                 <Button size="sm" className="bg-gradient-to-r from-[#cd3f2c] to-[#db7d30] rounded-xl shadow-md shadow-[#cd3f2c]/15">
@@ -172,18 +177,23 @@ export function AdminDashboardPage() {
       </div>
 
       {/* Stats */}
+      {canViewStaffData && (
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
         <AdminStatCard label="Projects" value={projects.length} icon={FolderKanban} />
         <AdminStatCard label="In Portfolio" value={stats.published} sub={`${stats.drafts} internal`} icon={Eye} accent="text-emerald-400" />
         <AdminStatCard label="Featured" value={stats.featured} icon={Star} />
         <AdminStatCard label="Clients" value={clients.length} icon={Users} accent="text-blue-400" />
-        <AdminStatCard label="Inquiries" value={newInquiryCount} sub={`${inquiries.length} total`} icon={Inbox} />
+        {canViewInquiries && (
+          <AdminStatCard label="Inquiries" value={newInquiryCount} sub={`${inquiries.length} total`} icon={Inbox} />
+        )}
         <AdminStatCard label="Drafts" value={stats.drafts} icon={FileEdit} accent="text-gray-400" />
       </div>
+      )}
 
       {/* Main grid */}
       <div className="grid lg:grid-cols-12 gap-4">
         {/* Pipeline */}
+        {canViewStaffData && (
         <Card className="lg:col-span-4 bg-white/[0.02] border-white/[0.06] p-5 rounded-2xl">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center gap-2">
@@ -217,8 +227,10 @@ export function AdminDashboardPage() {
             Manage clients <ArrowRight className="w-3 h-3" />
           </Link>
         </Card>
+        )}
 
         {/* Recent projects */}
+        {canViewStaffData && (
         <Card className="lg:col-span-4 bg-white/[0.02] border-white/[0.06] p-5 rounded-2xl">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-white text-sm font-medium">Recent Projects</h2>
@@ -229,11 +241,13 @@ export function AdminDashboardPage() {
               title="No projects yet"
               description="Create your first project and add it to the portfolio."
               action={
+                canManageContent ? (
                 <Link to="/admin/projects/new">
                   <Button size="sm" className="bg-gradient-to-r from-[#cd3f2c] to-[#db7d30] rounded-lg text-xs">
                     <Plus className="w-3 h-3 mr-1" /> Create project
                   </Button>
                 </Link>
+                ) : undefined
               }
             />
           ) : (
@@ -264,8 +278,10 @@ export function AdminDashboardPage() {
             </ul>
           )}
         </Card>
+        )}
 
         {/* Inquiries */}
+        {canViewInquiries && (
         <Card className="lg:col-span-4 bg-white/[0.02] border-white/[0.06] p-5 rounded-2xl">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-white text-sm font-medium">Latest Inquiries</h2>
@@ -301,9 +317,10 @@ export function AdminDashboardPage() {
             </ul>
           )}
         </Card>
+        )}
 
         {/* Finance summary - role gated */}
-        {hasRole("super_admin", "admin", "finance") && (
+        {canViewFinance && (
           <Card className="lg:col-span-6 bg-white/[0.02] border-white/[0.06] p-5 rounded-2xl">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
@@ -338,7 +355,7 @@ export function AdminDashboardPage() {
         )}
 
         {/* Activity feed */}
-        <Card className={`${hasRole("super_admin", "admin", "finance") ? "lg:col-span-6" : "lg:col-span-12"} bg-white/[0.02] border-white/[0.06] p-5 rounded-2xl`}>
+        <Card className={`${canViewFinance ? "lg:col-span-6" : "lg:col-span-12"} bg-white/[0.02] border-white/[0.06] p-5 rounded-2xl`}>
           <div className="flex items-center gap-2 mb-4">
             <MessageSquare className="w-4 h-4 text-[#db7d30]" />
             <h2 className="text-white text-sm font-medium">Quick Actions</h2>

@@ -5,6 +5,7 @@ import { Footer } from "./components/Footer";
 import { ScrollToTop } from "./components/ScrollToTop";
 import { AuthProvider } from "./context/AuthContext";
 import { ProtectedRoute } from "./admin/ProtectedRoute";
+import { RequireRole } from "./admin/RequireRole";
 import { HomePage } from "./pages/HomePage";
 import { ServicesPage } from "./pages/ServicesPage";
 import { PortfolioPage } from "./pages/PortfolioPage";
@@ -95,17 +96,94 @@ export default function App() {
                 }
               >
                 <Route index element={<AdminDashboardPage />} />
-                <Route path="projects" element={<AdminProjectsPage />} />
-                <Route path="projects/new" element={<AdminProjectFormPage />} />
-                <Route path="projects/:id" element={<AdminProjectFormPage />} />
-                <Route path="clients" element={<AdminClientsPage />} />
-                <Route path="clients/new" element={<AdminClientFormPage />} />
-                <Route path="clients/:id" element={<AdminClientFormPage />} />
-                <Route path="inquiries" element={<AdminInquiriesPage />} />
-                <Route path="messages" element={<AdminMessagesPage />} />
-                <Route path="finance" element={<AdminFinancePage />} />
-                <Route path="analytics" element={<AdminAnalyticsPage />} />
-                <Route path="users" element={<AdminUsersPage />} />
+                <Route
+                  path="projects"
+                  element={
+                    <RequireRole roles={["super_admin", "admin", "editor"]}>
+                      <AdminProjectsPage />
+                    </RequireRole>
+                  }
+                />
+                <Route
+                  path="projects/new"
+                  element={
+                    <RequireRole roles={["super_admin", "admin", "editor"]}>
+                      <AdminProjectFormPage />
+                    </RequireRole>
+                  }
+                />
+                <Route
+                  path="projects/:id"
+                  element={
+                    <RequireRole roles={["super_admin", "admin", "editor"]}>
+                      <AdminProjectFormPage />
+                    </RequireRole>
+                  }
+                />
+                <Route
+                  path="clients"
+                  element={
+                    <RequireRole roles={["super_admin", "admin", "editor"]}>
+                      <AdminClientsPage />
+                    </RequireRole>
+                  }
+                />
+                <Route
+                  path="clients/new"
+                  element={
+                    <RequireRole roles={["super_admin", "admin", "editor"]}>
+                      <AdminClientFormPage />
+                    </RequireRole>
+                  }
+                />
+                <Route
+                  path="clients/:id"
+                  element={
+                    <RequireRole roles={["super_admin", "admin", "editor"]}>
+                      <AdminClientFormPage />
+                    </RequireRole>
+                  }
+                />
+                <Route
+                  path="inquiries"
+                  element={
+                    <RequireRole roles={["super_admin", "admin", "editor"]}>
+                      <AdminInquiriesPage />
+                    </RequireRole>
+                  }
+                />
+                <Route
+                  path="messages"
+                  element={
+                    <RequireRole roles={["super_admin", "admin", "editor"]}>
+                      <AdminMessagesPage />
+                    </RequireRole>
+                  }
+                />
+                <Route
+                  path="finance"
+                  element={
+                    <RequireRole roles={["super_admin", "admin", "finance"]}>
+                      <AdminFinancePage />
+                    </RequireRole>
+                  }
+                />
+                <Route
+                  path="analytics"
+                  element={
+                    <RequireRole roles={["super_admin", "admin", "editor", "finance", "viewer"]}>
+                      <AdminAnalyticsPage />
+                    </RequireRole>
+                  }
+                />
+                <Route
+                  path="users"
+                  element={
+                    <RequireRole roles={["super_admin"]}>
+                      <AdminUsersPage />
+                    </RequireRole>
+                  }
+                />
                 <Route path="settings" element={<AdminSettingsPage />} />
               </Route>
               <Route path="/*" element={<PublicLayout />} />
