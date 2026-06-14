@@ -94,7 +94,15 @@ export function Portfolio() {
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-          {filteredProjects.map((project, index) => (
+          {filteredProjects.length === 0 ? (
+            <div className="col-span-full text-center py-16">
+              <p className="text-gray-500 text-lg mb-2">No projects to show yet</p>
+              <p className="text-gray-600 text-sm">
+                Projects marked &quot;Show in Portfolio&quot; in the admin will appear here.
+              </p>
+            </div>
+          ) : (
+            filteredProjects.map((project, index) => (
             <motion.div
               key={project.id}
               initial={{ opacity: 0, y: 20 }}
@@ -146,7 +154,8 @@ export function Portfolio() {
                 </div>
               </Card>
             </motion.div>
-          ))}
+            ))
+          )}
         </div>
 
         <Card className="bg-gradient-to-br from-[#cd3f2c]/10 to-[#db7d30]/10 border-[#db7d30]/50 p-12 text-center">

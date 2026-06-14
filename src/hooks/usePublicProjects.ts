@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useProjects } from "../hooks/useProjects";
-import { fallbackProjects, toDisplayProject, type DisplayProject } from "../lib/projects";
+import { toDisplayProject, type DisplayProject } from "../lib/projects";
 import { isSupabaseConfigured } from "../lib/supabase";
 
 export function usePublicProjects(options?: { featuredOnly?: boolean }) {
@@ -11,13 +11,10 @@ export function usePublicProjects(options?: { featuredOnly?: boolean }) {
 
   const displayProjects: DisplayProject[] = useMemo(() => {
     if (!isSupabaseConfigured || projects.length === 0) {
-      if (options?.featuredOnly) {
-        return fallbackProjects.slice(0, 2);
-      }
-      return fallbackProjects;
+      return [];
     }
     return projects.map(toDisplayProject);
-  }, [projects, options?.featuredOnly]);
+  }, [projects]);
 
   return {
     projects: displayProjects,

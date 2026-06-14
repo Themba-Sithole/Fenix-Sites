@@ -1,3 +1,77 @@
+export type UserRole = "super_admin" | "admin" | "editor" | "finance" | "viewer";
+
+export interface Profile {
+  id: string;
+  email: string;
+  full_name: string | null;
+  role: UserRole;
+  created_at: string;
+  updated_at: string;
+}
+
+export type FinanceType = "invoice" | "expense" | "payment";
+export type FinanceStatus = "pending" | "paid" | "overdue" | "cancelled";
+
+export interface FinanceRecord {
+  id: string;
+  title: string;
+  type: FinanceType;
+  amount: number;
+  currency: string;
+  status: FinanceStatus;
+  client_id: string | null;
+  project_id: string | null;
+  due_date: string | null;
+  notes: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+  clients?: Pick<Client, "id" | "name" | "company"> | null;
+}
+
+export type FinanceRecordInsert = Omit<
+  FinanceRecord,
+  "id" | "created_at" | "updated_at" | "clients" | "created_by"
+>;
+
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface Conversation {
+  id: string;
+  client_id: string | null;
+  inquiry_id: string | null;
+  subject: string | null;
+  participant_name: string;
+  participant_phone: string | null;
+  status: "open" | "closed";
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Message {
+  id: string;
+  conversation_id: string;
+  sender_id: string | null;
+  body: string;
+  is_outbound: boolean;
+  created_at: string;
+}
+
+export interface ProjectImage {
+  id: string;
+  project_id: string;
+  url: string;
+  is_cover: boolean;
+  sort_order: number;
+  created_at: string;
+}
+
 export type InquiryStatus = "new" | "read" | "replied" | "archived";
 
 export interface Inquiry {

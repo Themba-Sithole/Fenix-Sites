@@ -38,6 +38,15 @@ const AdminInquiriesPage = lazy(() =>
 const AdminAnalyticsPage = lazy(() =>
   import("./pages/admin/AdminAnalyticsPage").then((m) => ({ default: m.AdminAnalyticsPage }))
 );
+const AdminFinancePage = lazy(() =>
+  import("./pages/admin/AdminFinancePage").then((m) => ({ default: m.AdminFinancePage }))
+);
+const AdminMessagesPage = lazy(() =>
+  import("./pages/admin/AdminMessagesPage").then((m) => ({ default: m.AdminMessagesPage }))
+);
+const AdminUsersPage = lazy(() =>
+  import("./pages/admin/AdminUsersPage").then((m) => ({ default: m.AdminUsersPage }))
+);
 
 function AdminFallback() {
   return (
@@ -90,7 +99,10 @@ export default function App() {
                 <Route path="clients/new" element={<AdminClientFormPage />} />
                 <Route path="clients/:id" element={<AdminClientFormPage />} />
                 <Route path="inquiries" element={<AdminInquiriesPage />} />
+                <Route path="messages" element={<AdminMessagesPage />} />
+                <Route path="finance" element={<AdminFinancePage />} />
                 <Route path="analytics" element={<AdminAnalyticsPage />} />
+                <Route path="users" element={<AdminUsersPage />} />
               </Route>
               <Route path="/*" element={<PublicLayout />} />
             </Routes>

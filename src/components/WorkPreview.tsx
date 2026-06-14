@@ -25,7 +25,7 @@ export function WorkPreview() {
           <div className="flex justify-center py-16">
             <div className="w-8 h-8 border-2 border-[#db7d30] border-t-transparent rounded-full animate-spin" />
           </div>
-        ) : (
+        ) : projects.length === 0 ? null : (
           <motion.div
             className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto"
             initial="hidden"

@@ -1,16 +1,22 @@
 export const brand = {
   name: "FenixSites",
   tagline: "Premium Web Design Agency",
-  headline: "We craft digital experiences that",
-  headlineAccent: "convert.",
+  headline: "Websites That Convert.",
+  headlineAccent: "Built For Growth.",
   description:
-    "Stunning design, flawless code, and lightning-fast performance — built for South African businesses ready to stand out online.",
+    "Premium web design and development for businesses that want more leads, more credibility, and better results online.",
   cta: {
     primary: "Start Your Project",
     secondary: "View Our Work",
   },
   contactNote: "Free consultation · Response within 24 hours",
 } as const;
+
+export const trustItems = [
+  "Free Consultation",
+  "Response Within 24 Hours",
+  "No Obligation",
+] as const;
 
 export const qualitySignals = [
   "Custom Design",
@@ -22,9 +28,24 @@ export const qualitySignals = [
 ] as const;
 
 export const valueProps = [
-  { value: "100%", label: "Custom Built", detail: "No templates" },
-  { value: "<2s", label: "Load Time", detail: "Optimized" },
-  { value: "5★", label: "Rated", detail: "By clients" },
+  {
+    value: "100%",
+    label: "Custom Built",
+    detail: "Tailored designs, zero templates",
+    icon: "Code2" as const,
+  },
+  {
+    value: "<2s",
+    label: "Load Time",
+    detail: "Lightning-fast performance",
+    icon: "Zap" as const,
+  },
+  {
+    value: "5★",
+    label: "Star Rated",
+    detail: "Trusted by our clients",
+    icon: "Star" as const,
+  },
 ] as const;
 
 export const coreServices = [

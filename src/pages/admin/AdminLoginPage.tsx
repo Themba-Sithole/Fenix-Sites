@@ -7,15 +7,13 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { Card } from "../../components/ui/card";
 
-const ADMIN_EMAIL = "tjsgamerspro1@gmail.com";
-
 export function AdminLoginPage() {
   const { signIn, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? "/admin";
 
-  const [email, setEmail] = useState(ADMIN_EMAIL);
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -58,7 +56,7 @@ export function AdminLoginPage() {
             <Flame className="w-6 h-6 text-white" />
           </div>
           <h1 className="text-white text-xl font-semibold mb-1">FenixSites Admin</h1>
-          <p className="text-gray-400 text-sm">Sign in to manage projects and clients</p>
+          <p className="text-gray-400 text-sm">Sign in with your team account</p>
         </div>
 
         {!isSupabaseConfigured && (

@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Upload, X, Star } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { useProjects } from "../../hooks/useProjects";
 import { useClients } from "../../hooks/useClients";
+import { useProjectImages } from "../../hooks/useProjectImages";
 import type { ProjectFilter, ProjectInsert } from "../../lib/types/database";
+import { CategoryCombobox } from "../../components/admin/CategoryCombobox";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
@@ -41,12 +43,16 @@ export function AdminProjectFormPage() {
   const navigate = useNavigate();
   const { createProject, updateProject } = useProjects({ admin: true });
   const { clients } = useClients();
+  const { images, uploading, uploadImage, deleteImage, setCover } = useProjectImages(id);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState<ProjectInsert>(emptyForm);
   const [tagsInput, setTagsInput] = useState("");
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   useEffect(() => {
     if (!isEdit || !id || !supabase) return;
@@ -81,6 +87,25 @@ export function AdminProjectFormPage() {
       });
   }, [id, isEdit]);
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
+    setPendingFiles((prev) => [...prev, ...files]);
+    setPreviewUrls((prev) => [
+      ...prev,
+      ...files.map((f) => URL.createObjectURL(f)),
+    ]);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
+  const removePending = (index: number) => {
+    setPendingFiles((prev) => prev.filter((_, i) => i !== index));
+    setPreviewUrls((prev) => {
+      URL.revokeObjectURL(prev[index]);
+      return prev.filter((_, i) => i !== index);
+    });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -101,11 +126,24 @@ export function AdminProjectFormPage() {
     };
 
     try {
+      let projectId = id;
+
       if (isEdit && id) {
         await updateProject(id, payload);
       } else {
-        await createProject(payload);
+        const created = await createProject(payload);
+        projectId = created.id;
       }
+
+      if (projectId && pendingFiles.length > 0) {
+        for (let i = 0; i < pendingFiles.length; i++) {
+          const img = await uploadImage(pendingFiles[i], projectId, i === 0 && !form.image_url);
+          if (i === 0 && !form.image_url) {
+            await updateProject(projectId, { image_url: img.url });
+          }
+        }
+      }
+
       navigate("/admin/projects");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save project");
@@ -136,8 +174,8 @@ export function AdminProjectFormPage() {
         {isEdit ? "Edit Project" : "New Project"}
       </h1>
 
-      <Card className="bg-white/5 border-white/10 p-6">
-        <form onSubmit={handleSubmit} className="space-y-5 max-w-2xl">
+      <Card className="bg-white/[0.03] border-white/10 p-6">
+        <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
           <div className="grid sm:grid-cols-2 gap-4">
             <div className="sm:col-span-2">
               <Label className="text-gray-300">Title *</Label>
@@ -150,13 +188,12 @@ export function AdminProjectFormPage() {
             </div>
             <div>
               <Label className="text-gray-300">Category *</Label>
-              <Input
-                value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
-                required
-                placeholder="E-Commerce, Landing Page…"
-                className="mt-1.5 bg-white/5 border-white/10 text-white"
-              />
+              <div className="mt-1.5">
+                <CategoryCombobox
+                  value={form.category}
+                  onChange={(v) => setForm({ ...form, category: v })}
+                />
+              </div>
             </div>
             <div>
               <Label className="text-gray-300">Filter</Label>
@@ -187,8 +224,84 @@ export function AdminProjectFormPage() {
                 className="mt-1.5 bg-white/5 border-white/10 text-white"
               />
             </div>
+
+            {/* Photo upload */}
             <div className="sm:col-span-2">
-              <Label className="text-gray-300">Image URL</Label>
+              <Label className="text-gray-300">Project Photos</Label>
+              <div className="mt-1.5 space-y-3">
+                <input
+                  ref={fileRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  multiple
+                  className="hidden"
+                  onChange={handleFileSelect}
+                />
+                <button
+                  type="button"
+                  onClick={() => fileRef.current?.click()}
+                  disabled={uploading}
+                  className="w-full border-2 border-dashed border-white/10 rounded-xl p-6 hover:border-[#db7d30]/40 hover:bg-white/[0.02] transition-colors flex flex-col items-center gap-2 text-gray-400 hover:text-gray-300"
+                >
+                  <Upload className="w-6 h-6" />
+                  <span className="text-sm">
+                    {uploading ? "Uploading…" : "Click to upload photos"}
+                  </span>
+                  <span className="text-xs text-gray-600">JPG, PNG, WebP up to 5MB</span>
+                </button>
+
+                {(previewUrls.length > 0 || images.length > 0) && (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                    {images.map((img) => (
+                      <div key={img.id} className="relative group aspect-square rounded-lg overflow-hidden bg-white/5">
+                        <img src={img.url} alt="" className="w-full h-full object-cover" />
+                        {img.is_cover && (
+                          <span className="absolute top-1 left-1 bg-[#db7d30] text-white text-[9px] px-1.5 py-0.5 rounded">
+                            Cover
+                          </span>
+                        )}
+                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                          {!img.is_cover && (
+                            <button
+                              type="button"
+                              onClick={() => setCover(img.id, id!)}
+                              className="p-1.5 bg-white/20 rounded-lg hover:bg-white/30"
+                            >
+                              <Star className="w-3 h-3 text-white" />
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => deleteImage(img.id)}
+                            className="p-1.5 bg-red-500/40 rounded-lg hover:bg-red-500/60"
+                          >
+                            <X className="w-3 h-3 text-white" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    {previewUrls.map((url, i) => (
+                      <div key={url} className="relative group aspect-square rounded-lg overflow-hidden bg-white/5">
+                        <img src={url} alt="" className="w-full h-full object-cover" />
+                        <span className="absolute top-1 left-1 bg-blue-500/80 text-white text-[9px] px-1.5 py-0.5 rounded">
+                          New
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => removePending(i)}
+                          className="absolute top-1 right-1 p-1 bg-black/60 rounded-lg opacity-0 group-hover:opacity-100"
+                        >
+                          <X className="w-3 h-3 text-white" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div className="sm:col-span-2">
+              <Label className="text-gray-300">Or paste Image URL</Label>
               <Input
                 value={form.image_url ?? ""}
                 onChange={(e) => setForm({ ...form, image_url: e.target.value })}
@@ -196,6 +309,7 @@ export function AdminProjectFormPage() {
                 className="mt-1.5 bg-white/5 border-white/10 text-white"
               />
             </div>
+
             <div>
               <Label className="text-gray-300">Client</Label>
               <Select
@@ -266,20 +380,31 @@ export function AdminProjectFormPage() {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-6 pt-2">
-            <div className="flex items-center gap-3">
+          <div className="rounded-xl bg-white/[0.02] border border-white/10 p-4 space-y-4">
+            <p className="text-gray-400 text-xs uppercase tracking-wider">Visibility</p>
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-white text-sm">Show in Portfolio</Label>
+                <p className="text-gray-600 text-xs mt-0.5">
+                  Display this project on the public portfolio page
+                </p>
+              </div>
               <Switch
                 checked={form.published}
                 onCheckedChange={(v) => setForm({ ...form, published: v })}
               />
-              <Label className="text-gray-300">Published on site</Label>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-white text-sm">Featured on Homepage</Label>
+                <p className="text-gray-600 text-xs mt-0.5">
+                  Highlight on the homepage work section
+                </p>
+              </div>
               <Switch
                 checked={form.featured}
                 onCheckedChange={(v) => setForm({ ...form, featured: v })}
               />
-              <Label className="text-gray-300">Featured on homepage</Label>
             </div>
           </div>
 
@@ -288,7 +413,7 @@ export function AdminProjectFormPage() {
           <div className="flex gap-3 pt-2">
             <Button
               type="submit"
-              disabled={saving}
+              disabled={saving || uploading}
               className="bg-gradient-to-r from-[#cd3f2c] to-[#db7d30]"
             >
               {saving ? "Saving…" : isEdit ? "Update Project" : "Create Project"}

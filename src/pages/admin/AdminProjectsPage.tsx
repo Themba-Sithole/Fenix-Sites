@@ -103,9 +103,9 @@ export function AdminProjectsPage() {
                 <div className="flex flex-wrap items-center gap-2 mb-1">
                   <p className="text-white font-medium truncate">{project.title}</p>
                   {project.published ? (
-                    <Badge className="bg-emerald-500/20 text-emerald-300 border-0 text-xs">Published</Badge>
+                    <Badge className="bg-emerald-500/20 text-emerald-300 border-0 text-xs">Portfolio</Badge>
                   ) : (
-                    <Badge className="bg-gray-500/20 text-gray-400 border-0 text-xs">Draft</Badge>
+                    <Badge className="bg-gray-500/20 text-gray-400 border-0 text-xs">Internal</Badge>
                   )}
                   {project.featured && (
                     <Badge className="bg-[#db7d30]/20 text-[#edcca5] border-0 text-xs">Featured</Badge>
@@ -122,7 +122,7 @@ export function AdminProjectsPage() {
                   variant="outline"
                   className="border-white/10 text-gray-300"
                   onClick={() => togglePublished(project.id, project.published)}
-                  title={project.published ? "Unpublish" : "Publish"}
+                  title={project.published ? "Remove from portfolio" : "Add to portfolio"}
                 >
                   {project.published ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </Button>

@@ -5,22 +5,23 @@ export function MarqueeBar() {
   const items = [...qualitySignals, ...qualitySignals];
 
   return (
-    <section className="py-6 border-y border-white/[0.06] bg-black overflow-hidden">
+    <section className="relative py-5 sm:py-6 border-y border-white/[0.06] bg-black overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-r from-black via-transparent to-black z-10 pointer-events-none" />
       <div className="relative">
-        <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-black to-transparent z-10" />
-        <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-black to-transparent z-10" />
         <motion.div
-          className="flex gap-12 whitespace-nowrap"
+          className="flex gap-10 sm:gap-14 whitespace-nowrap"
           animate={{ x: ["0%", "-50%"] }}
-          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+          transition={{ duration: 35, repeat: Infinity, ease: "linear" }}
         >
           {items.map((item, i) => (
             <span
               key={`${item}-${i}`}
-              className="flex items-center gap-12 text-sm text-gray-500 tracking-wide uppercase"
+              className="flex items-center gap-10 sm:gap-14 shrink-0"
             >
-              <span>{item}</span>
-              <span className="w-1 h-1 rounded-full bg-[#db7d30]/60" />
+              <span className="font-display text-sm sm:text-base font-semibold tracking-[0.18em] uppercase text-gray-500 hover:text-[#db7d30]/80 transition-colors">
+                {item}
+              </span>
+              <span className="w-1.5 h-1.5 rounded-full bg-gradient-to-br from-[#cd3f2c] to-[#db7d30] shadow-[0_0_8px_rgba(219,125,48,0.5)]" />
             </span>
           ))}
         </motion.div>
