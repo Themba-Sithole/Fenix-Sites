@@ -1,32 +1,50 @@
-import { ArrowRight, ArrowUpRight, Code2, Star, Zap } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Sparkles } from "lucide-react";
 import { motion } from "motion/react";
 import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
-import { brand, trustItems, valueProps } from "../lib/content";
-import { fadeInUp, slideInLeft, staggerContainer } from "../lib/motion";
+import { brand, valueProps } from "../lib/content";
+import { fadeInUp, staggerContainer } from "../lib/motion";
 
 const HeroSpline = lazy(() =>
   import("./HeroSpline").then((m) => ({ default: m.HeroSpline }))
 );
 
-const statIcons = { Code2, Zap, Star } as const;
-
 export function Hero() {
   return (
-    <section id="home" className="relative min-h-screen bg-black overflow-hidden">
-      {/* ── Spline: shifted right so robot sits center-right ── */}
+    <section
+      id="home"
+      className="relative h-screen min-h-[640px] bg-black overflow-hidden"
+    >
+      {/* Subtle grid */}
+      <div className="absolute inset-0 hero-premium-grid opacity-[0.35] z-[1] pointer-events-none" />
+
+      {/* Orange ambient glow — centered behind robot */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[35%] w-[min(900px,90vw)] h-[min(560px,70vh)] bg-[#cd3f2c]/20 rounded-full blur-[130px] z-[1] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[30%] w-[min(480px,60vw)] h-[min(320px,45vh)] bg-[#db7d30]/12 rounded-full blur-[90px] z-[1] pointer-events-none" />
+
+      {/* Cinematic edge vignette — keeps center clear for robot */}
+      <div className="absolute inset-0 z-[2] pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_0%,transparent_45%,rgba(0,0,0,0.55)_100%)]" />
+      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/70 to-transparent z-[2] pointer-events-none" />
+
+      {/* Robot — centered, behind content, floating */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute inset-y-0 -right-[10%] w-[120%] sm:w-[110%] lg:left-[22%] lg:right-[-5%] lg:w-auto opacity-75">
-          <Suspense
-            fallback={
-              <div className="w-full h-full bg-gradient-to-b from-black via-[#0a0505] to-black" />
-            }
-          >
-            <HeroSpline />
-          </Suspense>
-        </div>
+        <motion.div
+          className="absolute inset-0 -top-[6%] flex items-center justify-center"
+          animate={{ y: [0, -14, 0] }}
+          transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <div className="w-full h-[115%] max-w-[100vw] opacity-80">
+            <Suspense
+              fallback={
+                <div className="w-full h-full bg-gradient-to-b from-black via-[#0a0505] to-black" />
+              }
+            >
+              <HeroSpline />
+            </Suspense>
+          </div>
+        </motion.div>
         <div
-          className="absolute bottom-0 right-0 z-[2] w-72 h-20"
+          className="absolute bottom-0 right-0 z-[2] w-72 h-20 pointer-events-none"
           style={{
             background:
               "linear-gradient(135deg, transparent 25%, rgba(0,0,0,0.98) 60%, #000 100%)",
@@ -34,115 +52,79 @@ export function Hero() {
         />
       </div>
 
-      {/* ── Lighting ── */}
-      <div className="absolute bottom-0 left-1/2 lg:left-[62%] -translate-x-1/2 w-[700px] h-[420px] bg-[#cd3f2c]/30 rounded-full blur-[140px] z-[1] pointer-events-none" />
-      <div className="absolute bottom-0 left-1/2 lg:left-[62%] -translate-x-1/2 w-[400px] h-[200px] bg-[#db7d30]/20 rounded-full blur-[80px] z-[1] pointer-events-none" />
-      <div
-        className="absolute inset-0 z-[1] pointer-events-none"
-        style={{
-          background:
-            "linear-gradient(90deg, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.55) 38%, rgba(0,0,0,0.08) 58%, transparent 72%)",
-        }}
-      />
-      <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black via-black/70 to-transparent z-[1] pointer-events-none" />
-
-      {/* ── Page content ── */}
-      <div className="relative z-10 min-h-screen flex flex-col">
-        {/* Upper: copy left, robot zone right */}
-        <div className="flex-1 flex items-center pt-24 lg:pt-28 pb-8 lg:pb-4">
-          <div className="container mx-auto px-5 sm:px-8 lg:px-10 w-full">
-            <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-              {/* Left — headline & CTAs */}
-              <motion.div
-                className="text-left max-w-xl lg:max-w-none"
-                initial="hidden"
-                animate="visible"
-                variants={staggerContainer(0.09, 0.1)}
-              >
-                <motion.h1
-                  variants={slideInLeft}
-                  className="font-display font-bold leading-[1.06] tracking-[-0.025em] text-[clamp(2.25rem,5.2vw,4rem)] mb-5"
-                >
-                  <span className="block text-white">{brand.headline}</span>
-                  <span className="block mt-1 text-[#db7d30]">{brand.headlineAccent}</span>
-                </motion.h1>
-
-                <motion.p
-                  variants={slideInLeft}
-                  className="text-gray-400 text-base sm:text-lg leading-relaxed mb-8 max-w-md font-body"
-                >
-                  {brand.description}
-                </motion.p>
-
-                <motion.div
-                  variants={slideInLeft}
-                  className="flex flex-col sm:flex-row gap-3 sm:gap-4"
-                >
-                  <Link to="/contact" className="group">
-                    <span className="inline-flex items-center justify-center gap-2.5 h-[52px] sm:h-14 px-8 sm:px-9 rounded-2xl text-[15px] sm:text-base font-semibold text-white bg-gradient-to-r from-[#cd3f2c] to-[#db7d30] shadow-[0_8px_32px_-6px_rgba(205,63,44,0.55)] transition-all duration-300 group-hover:brightness-110 group-hover:scale-[1.02] w-full sm:w-auto">
-                      {brand.cta.primary}
-                      <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
-                    </span>
-                  </Link>
-                  <Link to="/portfolio" className="group">
-                    <span className="inline-flex items-center justify-center gap-2 h-[52px] sm:h-14 px-8 sm:px-9 rounded-2xl text-[15px] sm:text-base font-medium text-white border border-white/12 bg-black/50 backdrop-blur-sm transition-all duration-300 group-hover:border-[#db7d30]/45 group-hover:bg-white/[0.05] w-full sm:w-auto">
-                      {brand.cta.secondary}
-                      <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 text-[#db7d30]" />
-                    </span>
-                  </Link>
-                </motion.div>
-              </motion.div>
-
-              {/* Right — open zone for robot (visible on all breakpoints) */}
-              <div
-                className="min-h-[220px] sm:min-h-[280px] lg:min-h-[340px]"
-                aria-hidden="true"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Lower: full-width glass cards + trust bar */}
+      {/* Hero content — centered stack */}
+      <div className="relative z-10 h-full flex items-center justify-center px-5 sm:px-8 pt-20 pb-10">
         <motion.div
-          className="container mx-auto px-5 sm:px-8 lg:px-10 pb-8 sm:pb-10 mt-auto"
+          className="w-full max-w-[1400px] mx-auto flex flex-col items-center text-center"
           initial="hidden"
           animate="visible"
-          variants={staggerContainer(0.1, 0.4)}
+          variants={staggerContainer(0.09, 0.12)}
         >
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 w-full mb-7">
-            {valueProps.map((prop) => {
-              const Icon = statIcons[prop.icon];
-              return (
-                <motion.div
-                  key={prop.label}
-                  variants={fadeInUp}
-                  className="group flex flex-col items-center text-center px-5 py-6 sm:px-6 sm:py-7 rounded-2xl border border-white/[0.07] bg-white/[0.04] backdrop-blur-md transition-all duration-300 hover:border-[#db7d30]/30 hover:bg-white/[0.06]"
-                >
-                  <div className="flex items-center justify-center w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#cd3f2c]/12 border border-[#db7d30]/25 mb-4">
-                    <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-[#db7d30]" strokeWidth={2} />
-                  </div>
-                  <p className="font-display text-base sm:text-lg font-bold text-white mb-1.5">
-                    {prop.value} {prop.label}
-                  </p>
-                  <p className="text-gray-500 text-xs sm:text-sm leading-relaxed max-w-[220px]">
-                    {prop.detail}
-                  </p>
-                </motion.div>
-              );
-            })}
-          </div>
-
+          {/* Badge */}
           <motion.div
             variants={fadeInUp}
-            className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs sm:text-sm text-gray-500 font-body"
+            className="mb-8 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#db7d30]/30 bg-white/[0.04] backdrop-blur-md shadow-[0_0_24px_-6px_rgba(219,125,48,0.35)]"
           >
-            {trustItems.map((item, i) => (
-              <span key={item} className="flex items-center gap-4">
-                {i > 0 && (
-                  <span className="w-1 h-1 rounded-full bg-[#db7d30]" aria-hidden="true" />
-                )}
-                {item}
+            <Sparkles className="w-3.5 h-3.5 text-[#db7d30]" />
+            <span className="text-[11px] sm:text-xs tracking-[0.2em] uppercase text-gray-200 font-medium">
+              {brand.tagline}
+            </span>
+          </motion.div>
+
+          {/* Headline */}
+          <motion.h1
+            variants={fadeInUp}
+            className="font-display font-bold leading-[1.02] tracking-[-0.03em] text-[clamp(2.5rem,6.5vw,6rem)] mb-6 hero-headline-shadow"
+          >
+            <span className="block text-white">{brand.headline}</span>
+            <span className="block mt-1 text-[#db7d30]">{brand.headlineAccent}</span>
+          </motion.h1>
+
+          {/* Subheading */}
+          <motion.p
+            variants={fadeInUp}
+            className="text-gray-400 text-base sm:text-lg md:text-xl leading-relaxed max-w-[700px] mb-10 font-body"
+          >
+            {brand.description}
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            variants={fadeInUp}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12 sm:mb-14"
+          >
+            <Link to="/contact" className="group w-full sm:w-auto">
+              <span className="hero-btn-primary inline-flex items-center justify-center gap-2.5 h-14 px-9 rounded-2xl text-base font-semibold text-white bg-gradient-to-r from-[#cd3f2c] to-[#db7d30] shadow-[0_8px_32px_-6px_rgba(205,63,44,0.55)] transition-all duration-300 w-full sm:w-auto">
+                {brand.cta.primary}
+                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5" />
               </span>
+            </Link>
+            <Link to="/portfolio" className="group w-full sm:w-auto">
+              <span className="inline-flex items-center justify-center gap-2 h-14 px-9 rounded-2xl text-base font-medium text-white border border-white/12 bg-white/[0.04] backdrop-blur-md transition-all duration-300 group-hover:border-[#db7d30]/45 group-hover:bg-white/[0.08] group-hover:shadow-[0_0_28px_-8px_rgba(219,125,48,0.4)] w-full sm:w-auto">
+                {brand.cta.secondary}
+                <ArrowUpRight className="w-5 h-5 text-[#db7d30] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              </span>
+            </Link>
+          </motion.div>
+
+          {/* Stat cards */}
+          <motion.div
+            variants={staggerContainer(0.08, 0.2)}
+            className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-3xl"
+          >
+            {valueProps.map((prop) => (
+              <motion.div
+                key={prop.label}
+                variants={fadeInUp}
+                className="hero-stat-card flex flex-col items-center justify-center py-6 px-4 rounded-2xl border border-[#db7d30]/15 bg-black/30 backdrop-blur-md text-center"
+              >
+                <p className="font-display text-2xl sm:text-3xl font-bold text-[#db7d30] leading-none mb-2">
+                  {prop.value}
+                </p>
+                <p className="text-white text-sm sm:text-base font-medium tracking-wide">
+                  {prop.label}
+                </p>
+              </motion.div>
             ))}
           </motion.div>
         </motion.div>

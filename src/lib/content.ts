@@ -42,7 +42,7 @@ export const valueProps = [
   },
   {
     value: "5★",
-    label: "Star Rated",
+    label: "Rated",
     detail: "Trusted by our clients",
     icon: "Star" as const,
   },
