@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { Check, ChevronsUpDown, Plus } from "lucide-react";
 import { cn } from "../ui/utils";
 import { Button } from "../ui/button";
@@ -19,7 +19,7 @@ interface CategoryComboboxProps {
   className?: string;
 }
 
-export function CategoryCombobox({ value, onChange, className }: CategoryComboboxProps) {
+export const CategoryCombobox = memo(function CategoryCombobox({ value, onChange, className }: CategoryComboboxProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const { categories, addCategory } = useCategories();
@@ -119,4 +119,4 @@ export function CategoryCombobox({ value, onChange, className }: CategoryCombobo
       </PopoverContent>
     </Popover>
   );
-}
+});

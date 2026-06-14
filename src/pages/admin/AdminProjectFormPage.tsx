@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, lazy, Suspense, useCallback } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { ArrowLeft, Upload, X, Star } from "lucide-react";
 import { supabase } from "../../lib/supabase";
@@ -6,7 +6,10 @@ import { useProjects } from "../../hooks/useProjects";
 import { useClients } from "../../hooks/useClients";
 import { useProjectImages } from "../../hooks/useProjectImages";
 import type { ProjectFilter, ProjectInsert } from "../../lib/types/database";
-import { CategoryCombobox } from "../../components/admin/CategoryCombobox";
+
+const CategoryCombobox = lazy(() =>
+  import("../../components/admin/CategoryCombobox").then((m) => ({ default: m.CategoryCombobox }))
+);
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
@@ -87,7 +90,7 @@ export function AdminProjectFormPage() {
       });
   }, [id, isEdit]);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
     if (!files.length) return;
     setPendingFiles((prev) => [...prev, ...files]);
@@ -96,7 +99,7 @@ export function AdminProjectFormPage() {
       ...files.map((f) => URL.createObjectURL(f)),
     ]);
     if (fileRef.current) fileRef.current.value = "";
-  };
+  }, []);
 
   const removePending = (index: number) => {
     setPendingFiles((prev) => prev.filter((_, i) => i !== index));
@@ -189,10 +192,14 @@ export function AdminProjectFormPage() {
             <div>
               <Label className="text-gray-300">Category *</Label>
               <div className="mt-1.5">
-                <CategoryCombobox
-                  value={form.category}
-                  onChange={(v) => setForm({ ...form, category: v })}
-                />
+                <Suspense fallback={
+                  <div className="h-9 rounded-md bg-white/5 border border-white/10 animate-pulse" />
+                }>
+                  <CategoryCombobox
+                    value={form.category}
+                    onChange={(v) => setForm((f) => ({ ...f, category: v }))}
+                  />
+                </Suspense>
               </div>
             </div>
             <div>

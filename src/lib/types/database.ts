@@ -1,10 +1,20 @@
 export type UserRole = "super_admin" | "admin" | "editor" | "finance" | "viewer";
 
+export interface UserSettings {
+  email_notifications?: boolean;
+  compact_sidebar?: boolean;
+  agency_name?: string;
+  agency_phone?: string;
+  agency_email?: string;
+  default_currency?: string;
+}
+
 export interface Profile {
   id: string;
   email: string;
   full_name: string | null;
   role: UserRole;
+  settings?: UserSettings;
   created_at: string;
   updated_at: string;
 }

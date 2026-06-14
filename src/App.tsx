@@ -47,6 +47,9 @@ const AdminMessagesPage = lazy(() =>
 const AdminUsersPage = lazy(() =>
   import("./pages/admin/AdminUsersPage").then((m) => ({ default: m.AdminUsersPage }))
 );
+const AdminSettingsPage = lazy(() =>
+  import("./pages/admin/AdminSettingsPage").then((m) => ({ default: m.AdminSettingsPage }))
+);
 
 function AdminFallback() {
   return (
@@ -103,6 +106,7 @@ export default function App() {
                 <Route path="finance" element={<AdminFinancePage />} />
                 <Route path="analytics" element={<AdminAnalyticsPage />} />
                 <Route path="users" element={<AdminUsersPage />} />
+                <Route path="settings" element={<AdminSettingsPage />} />
               </Route>
               <Route path="/*" element={<PublicLayout />} />
             </Routes>

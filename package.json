@@ -65,6 +65,7 @@
           "setup:admin": "node scripts/setup-admin.mjs",
           "setup:db": "node scripts/setup-database.mjs",
           "confirm:admin": "node scripts/confirm-admin-email.mjs",
-          "migrate:002": "node scripts/apply-002.mjs"
+          "migrate:002": "node scripts/apply-002.mjs",
+          "migrate:003": "node scripts/apply-003.mjs"
       }
 }
