@@ -1,9 +1,8 @@
-import { ArrowRight, ArrowUpRight, Sparkles } from "lucide-react";
+﻿import { ArrowRight, Sparkles } from "lucide-react";
+import { Button } from "./ui/button";
 import { motion } from "motion/react";
 import { lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
-import { brand, valueProps } from "../lib/content";
-import { fadeInUp, staggerContainer } from "../lib/motion";
 
 const HeroSpline = lazy(() =>
   import("./HeroSpline").then((m) => ({ default: m.HeroSpline }))
@@ -11,123 +10,251 @@ const HeroSpline = lazy(() =>
 
 export function Hero() {
   return (
-    <section
-      id="home"
-      className="relative h-screen min-h-[640px] bg-black overflow-hidden"
-    >
-      {/* Subtle grid */}
-      <div className="absolute inset-0 hero-premium-grid opacity-[0.35] z-[1] pointer-events-none" />
-
-      {/* Orange ambient glow — centered behind robot */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[35%] w-[min(900px,90vw)] h-[min(560px,70vh)] bg-[#cd3f2c]/20 rounded-full blur-[130px] z-[1] pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[30%] w-[min(480px,60vw)] h-[min(320px,45vh)] bg-[#db7d30]/12 rounded-full blur-[90px] z-[1] pointer-events-none" />
-
-      {/* Cinematic edge vignette — keeps center clear for robot */}
-      <div className="absolute inset-0 z-[2] pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_0%,transparent_45%,rgba(0,0,0,0.55)_100%)]" />
-      <div className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/70 to-transparent z-[2] pointer-events-none" />
-
-      {/* Robot — centered, behind content, floating */}
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <motion.div
-          className="absolute inset-0 -top-[6%] flex items-center justify-center"
-          animate={{ y: [0, -14, 0] }}
-          transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+    <section id="home" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-black pt-20">
+      {/* Spline 3D Background */}
+      <div className="absolute inset-0 w-full h-full opacity-50">
+        <Suspense
+          fallback={
+            <div className="w-full h-full bg-gradient-to-b from-black via-[#0a0505] to-black" />
+          }
         >
-          <div className="w-full h-[115%] max-w-[100vw] opacity-80">
-            <Suspense
-              fallback={
-                <div className="w-full h-full bg-gradient-to-b from-black via-[#0a0505] to-black" />
-              }
-            >
-              <HeroSpline />
-            </Suspense>
-          </div>
-        </motion.div>
-        <div
-          className="absolute bottom-0 right-0 z-[2] w-72 h-20 pointer-events-none"
-          style={{
-            background:
-              "linear-gradient(135deg, transparent 25%, rgba(0,0,0,0.98) 60%, #000 100%)",
-          }}
-        />
+          <HeroSpline />
+        </Suspense>
       </div>
 
-      {/* Hero content — centered stack */}
-      <div className="relative z-10 h-full flex items-center justify-center px-5 sm:px-8 pt-20 pb-10">
-        <motion.div
-          className="w-full max-w-[1400px] mx-auto flex flex-col items-center text-center"
-          initial="hidden"
-          animate="visible"
-          variants={staggerContainer(0.09, 0.12)}
-        >
+      {/* Gradient fade overlay to blend with content below */}
+      <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-black via-black/80 to-transparent z-[5]" />
+
+      {/* Background gradient effects with enhanced motion */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div 
+          className="absolute top-1/4 left-1/4 w-96 h-96 bg-[#cd3f2c]/20 rounded-full blur-3xl"
+          animate={{ 
+            scale: [1, 1.2, 1],
+            opacity: [0.2, 0.3, 0.2],
+            x: [0, 100, 0],
+            y: [0, 50, 0]
+          }}
+          transition={{ 
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        ></motion.div>
+        <motion.div 
+          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#db7d30]/20 rounded-full blur-3xl"
+          animate={{ 
+            scale: [1.2, 1, 1.2],
+            opacity: [0.3, 0.2, 0.3],
+            x: [0, -80, 0],
+            y: [0, -60, 0]
+          }}
+          transition={{ 
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        ></motion.div>
+        <motion.div 
+          className="absolute top-1/2 left-1/2 w-64 h-64 bg-[#edcca5]/10 rounded-full blur-3xl"
+          animate={{ 
+            scale: [1, 1.5, 1],
+            opacity: [0.1, 0.2, 0.1],
+            rotate: [0, 180, 360]
+          }}
+          transition={{ 
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        ></motion.div>
+      </div>
+
+      {/* Grid pattern overlay with animation */}
+      <motion.div 
+        className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.05)_1px,transparent_1px)] bg-[size:100px_100px] [mask-image:radial-gradient(ellipse_80%_80%_at_50%_50%,#000,transparent)] pointer-events-none"
+        animate={{
+          backgroundPosition: ['0px 0px', '100px 100px'],
+        }}
+        transition={{
+          duration: 20,
+          repeat: Infinity,
+          ease: "linear"
+        }}
+      ></motion.div>
+
+      {/* Scanline effect */}
+      <motion.div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'linear-gradient(to bottom, transparent 0%, rgba(205, 63, 44, 0.05) 50%, transparent 100%)',
+          height: '200px',
+        }}
+        animate={{
+          y: ['0vh', '100vh'],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          ease: "linear"
+        }}
+      />
+
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="max-w-4xl mx-auto text-center">
           {/* Badge */}
-          <motion.div
-            variants={fadeInUp}
-            className="mb-8 inline-flex items-center gap-2 px-4 py-2 rounded-full border border-[#db7d30]/30 bg-white/[0.04] backdrop-blur-md shadow-[0_0_24px_-6px_rgba(219,125,48,0.35)]"
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 border border-[#edcca5]/40 backdrop-blur-xl mb-6 shadow-2xl"
+            style={{
+              boxShadow: '0 0 30px rgba(237, 204, 165, 0.3), 0 10px 40px rgba(0, 0, 0, 0.5)'
+            }}
           >
-            <Sparkles className="w-3.5 h-3.5 text-[#db7d30]" />
-            <span className="text-[11px] sm:text-xs tracking-[0.2em] uppercase text-gray-200 font-medium">
-              {brand.tagline}
-            </span>
+            <Sparkles className="w-4 h-4 text-[#edcca5]" />
+            <span className="text-sm text-white font-medium">Premium Web Design Agency</span>
           </motion.div>
 
-          {/* Headline */}
-          <motion.h1
-            variants={fadeInUp}
-            className="font-display font-bold leading-[1.02] tracking-[-0.03em] text-[clamp(2.5rem,6.5vw,6rem)] mb-6 hero-headline-shadow"
+          {/* Main heading with animated gradient */}
+          <motion.h1 
+            className="text-white mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            style={{
+              textShadow: '0 4px 20px rgba(0, 0, 0, 0.8), 0 0 40px rgba(0, 0, 0, 0.6), 0 2px 10px rgba(0, 0, 0, 0.9)'
+            }}
           >
-            <span className="block text-white">{brand.headline}</span>
-            <span className="block mt-1 text-[#db7d30]">{brand.headlineAccent}</span>
+            <span className="block mb-2 drop-shadow-2xl">Transform Your Vision Into</span>
+            <motion.span 
+              className="block bg-gradient-to-r from-[#cd3f2c] via-[#db7d30] to-[#edcca5] bg-clip-text text-transparent"
+              animate={{
+                backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
+              }}
+              transition={{
+                duration: 5,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+              style={{
+                backgroundSize: '200% 200%',
+                filter: 'drop-shadow(0 4px 20px rgba(205, 63, 44, 0.5)) drop-shadow(0 0 40px rgba(219, 125, 48, 0.3))',
+              }}
+            >
+              Stunning Websites
+            </motion.span>
           </motion.h1>
 
-          {/* Subheading */}
-          <motion.p
-            variants={fadeInUp}
-            className="text-gray-400 text-base sm:text-lg md:text-xl leading-relaxed max-w-[700px] mb-10 font-body"
+          {/* Description */}
+          <motion.p 
+            className="text-gray-100 mb-8 max-w-2xl mx-auto text-lg backdrop-blur-sm bg-black/30 py-4 px-6 rounded-2xl border border-white/10"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            style={{
+              textShadow: '0 2px 10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.5)',
+              boxShadow: '0 0 30px rgba(0, 0, 0, 0.5), 0 10px 40px rgba(0, 0, 0, 0.4)'
+            }}
           >
-            {brand.description}
+            We craft exceptional digital experiences that captivate your audience and drive results. 
+            From concept to launch, we bring your ideas to life with cutting-edge design and development.
           </motion.p>
 
-          {/* CTAs */}
-          <motion.div
-            variants={fadeInUp}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12 sm:mb-14"
+          {/* CTA Buttons */}
+          <motion.div 
+            className="flex flex-col sm:flex-row items-center justify-center gap-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
           >
-            <Link to="/contact" className="group w-full sm:w-auto">
-              <span className="hero-btn-primary inline-flex items-center justify-center gap-2.5 h-14 px-9 rounded-2xl text-base font-semibold text-white bg-gradient-to-r from-[#cd3f2c] to-[#db7d30] shadow-[0_8px_32px_-6px_rgba(205,63,44,0.55)] transition-all duration-300 w-full sm:w-auto">
-                {brand.cta.primary}
-                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5" />
-              </span>
-            </Link>
-            <Link to="/portfolio" className="group w-full sm:w-auto">
-              <span className="inline-flex items-center justify-center gap-2 h-14 px-9 rounded-2xl text-base font-medium text-white border border-white/12 bg-white/[0.04] backdrop-blur-md transition-all duration-300 group-hover:border-[#db7d30]/45 group-hover:bg-white/[0.08] group-hover:shadow-[0_0_28px_-8px_rgba(219,125,48,0.4)] w-full sm:w-auto">
-                {brand.cta.secondary}
-                <ArrowUpRight className="w-5 h-5 text-[#db7d30] transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-              </span>
-            </Link>
+            <motion.div 
+              whileHover={{ scale: 1.05 }} 
+              whileTap={{ scale: 0.95 }}
+              style={{
+                filter: 'drop-shadow(0 0 20px rgba(205, 63, 44, 0.5)) drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5))'
+              }}
+            >
+              <Link to="/contact">
+                <Button 
+                  size="lg"
+                  className="bg-gradient-to-r from-[#cd3f2c] to-[#db7d30] hover:from-[#b33624] hover:to-[#c56d28] min-w-[200px] shadow-2xl"
+                  style={{
+                    boxShadow: '0 0 30px rgba(205, 63, 44, 0.4), 0 10px 40px rgba(0, 0, 0, 0.5)'
+                  }}
+                >
+                  Start Your Project
+                  <ArrowRight className="ml-2 w-4 h-4" />
+                </Button>
+              </Link>
+            </motion.div>
+            <motion.div 
+              whileHover={{ scale: 1.05 }} 
+              whileTap={{ scale: 0.95 }}
+              style={{
+                filter: 'drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5))'
+              }}
+            >
+              <Link to="/portfolio">
+                <Button 
+                  size="lg"
+                  variant="outline"
+                  className="border-[#edcca5]/40 text-white hover:bg-white/20 min-w-[200px] backdrop-blur-xl bg-white/10"
+                  style={{
+                    boxShadow: '0 0 20px rgba(237, 204, 165, 0.2), 0 10px 30px rgba(0, 0, 0, 0.5)'
+                  }}
+                >
+                  View Our Work
+                </Button>
+              </Link>
+            </motion.div>
           </motion.div>
 
-          {/* Stat cards */}
-          <motion.div
-            variants={staggerContainer(0.08, 0.2)}
-            className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-3xl"
+          {/* Stats */}
+          <motion.div 
+            className="grid grid-cols-3 gap-8 mt-16 pt-16 border-t border-white/20 backdrop-blur-md bg-white/5 rounded-2xl p-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+            style={{
+              boxShadow: '0 0 40px rgba(0, 0, 0, 0.5), 0 10px 50px rgba(0, 0, 0, 0.4)'
+            }}
           >
-            {valueProps.map((prop) => (
-              <motion.div
-                key={prop.label}
-                variants={fadeInUp}
-                className="hero-stat-card flex flex-col items-center justify-center py-6 px-4 rounded-2xl border border-[#db7d30]/15 bg-black/30 backdrop-blur-md text-center"
+            <motion.div whileHover={{ scale: 1.05 }}>
+              <div 
+                className="bg-gradient-to-r from-[#cd3f2c] to-[#db7d30] bg-clip-text text-transparent mb-2"
+                style={{
+                  filter: 'drop-shadow(0 2px 10px rgba(205, 63, 44, 0.4))'
+                }}
               >
-                <p className="font-display text-2xl sm:text-3xl font-bold text-[#db7d30] leading-none mb-2">
-                  {prop.value}
-                </p>
-                <p className="text-white text-sm sm:text-base font-medium tracking-wide">
-                  {prop.label}
-                </p>
-              </motion.div>
-            ))}
+                Fresh
+              </div>
+              <p className="text-sm text-gray-200" style={{ textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)' }}>New & Innovative</p>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }}>
+              <div 
+                className="bg-gradient-to-r from-[#cd3f2c] to-[#db7d30] bg-clip-text text-transparent mb-2"
+                style={{
+                  filter: 'drop-shadow(0 2px 10px rgba(219, 125, 48, 0.4))'
+                }}
+              >
+                100%
+              </div>
+              <p className="text-sm text-gray-200" style={{ textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)' }}>Client Satisfaction</p>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.05 }}>
+              <div 
+                className="bg-gradient-to-r from-[#cd3f2c] to-[#db7d30] bg-clip-text text-transparent mb-2"
+                style={{
+                  filter: 'drop-shadow(0 2px 10px rgba(237, 204, 165, 0.4))'
+                }}
+              >
+                Fast
+              </div>
+              <p className="text-sm text-gray-200" style={{ textShadow: '0 2px 8px rgba(0, 0, 0, 0.8)' }}>Quick Turnaround</p>
+            </motion.div>
           </motion.div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );

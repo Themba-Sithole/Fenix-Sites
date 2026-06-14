@@ -38,16 +38,6 @@ export const slideInLeft: Variants = {
   },
 };
 
-export const wordReveal: Variants = {
-  hidden: { opacity: 0, y: 24, filter: "blur(10px)" },
-  visible: {
-    opacity: 1,
-    y: 0,
-    filter: "blur(0px)",
-    transition: { duration: 0.75, ease: easeSmooth },
-  },
-};
-
 export const slideInRight: Variants = {
   hidden: { opacity: 0, x: 40 },
   visible: {
