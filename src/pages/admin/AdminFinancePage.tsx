@@ -11,6 +11,7 @@ import { useFinance } from "../../hooks/useFinance";
 import { useClients } from "../../hooks/useClients";
 import type { FinanceRecordInsert, FinanceType, FinanceStatus } from "../../lib/types/database";
 import { Card } from "../../components/ui/card";
+import { AdminPageHeader, adminCardClass } from "../../components/admin/AdminFormField";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
@@ -109,19 +110,18 @@ export function AdminFinancePage() {
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-white text-2xl font-semibold mb-1">Finance Manager</h1>
-          <p className="text-gray-500 text-sm">Track invoices, payments, and expenses</p>
-        </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button className="bg-gradient-to-r from-[#cd3f2c] to-[#db7d30]">
-              <Plus className="w-4 h-4 mr-2" />
-              New Record
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="bg-gray-900 border-white/10 text-white max-w-md">
+      <AdminPageHeader
+        title="Finance Manager"
+        description="Track invoices, payments, and expenses"
+        actions={
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button className="bg-gradient-to-r from-[#cd3f2c] to-[#db7d30]">
+                <Plus className="w-4 h-4 mr-2" />
+                New Record
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="bg-gray-900 border-white/10 text-white max-w-md">
             <DialogHeader>
               <DialogTitle>Add Finance Record</DialogTitle>
             </DialogHeader>
@@ -216,29 +216,32 @@ export function AdminFinancePage() {
             </form>
           </DialogContent>
         </Dialog>
-      </div>
+        }
+      />
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Invoiced", value: formatZAR(stats.totalInvoiced), icon: DollarSign, accent: "from-blue-500/20 to-blue-600/10" },
-          { label: "Collected", value: formatZAR(stats.totalPaid), icon: TrendingUp, accent: "from-emerald-500/20 to-emerald-600/10" },
-          { label: "Expenses", value: formatZAR(stats.totalExpenses), icon: TrendingDown, accent: "from-red-500/20 to-red-600/10" },
-          { label: "Net Revenue", value: formatZAR(netRevenue), icon: Clock, accent: "from-[#cd3f2c]/20 to-[#db7d30]/10" },
+          { label: "Invoiced", value: formatZAR(stats.totalInvoiced), icon: DollarSign },
+          { label: "Collected", value: formatZAR(stats.totalPaid), icon: TrendingUp },
+          { label: "Expenses", value: formatZAR(stats.totalExpenses), icon: TrendingDown },
+          { label: "Net Revenue", value: formatZAR(netRevenue), icon: Clock, highlight: true },
         ].map((s) => (
           <Card
             key={s.label}
-            className={`bg-gradient-to-br ${s.accent} border-white/10 p-5`}
+            className={`${adminCardClass} p-5 min-h-[108px] flex flex-col justify-between ${
+              s.highlight ? "bg-gradient-to-br from-[#cd3f2c]/10 to-[#db7d30]/5 border-[#db7d30]/20" : ""
+            }`}
           >
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-gray-400 text-xs uppercase tracking-wider">{s.label}</p>
-              <s.icon className="w-4 h-4 text-gray-400" />
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-gray-400 text-[11px] uppercase tracking-wider">{s.label}</p>
+              <s.icon className="w-4 h-4 text-gray-500 shrink-0" />
             </div>
-            <p className="text-white text-xl font-bold">{s.value}</p>
+            <p className="text-white text-xl font-bold tabular-nums leading-tight mt-3">{s.value}</p>
           </Card>
         ))}
       </div>
 
-      <Card className="bg-white/[0.03] border-white/10 overflow-hidden">
+      <Card className={`${adminCardClass} overflow-hidden mt-2`}>
         <Table>
           <TableHeader>
             <TableRow className="border-white/10 hover:bg-transparent">

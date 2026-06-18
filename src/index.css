@@ -3650,3 +3650,18 @@ html {
     height: 0;
   }
 }
+
+/* Admin dashboard toggles — Tailwind state variants are not always generated in this build */
+.admin-switch {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background-color: rgba(255, 255, 255, 0.18);
+}
+
+.admin-switch[data-state="checked"] {
+  background-color: #db7d30;
+  border-color: rgba(219, 125, 48, 0.5);
+}
+
+.admin-switch [data-slot="switch-thumb"] {
+  background-color: #fff;
+}

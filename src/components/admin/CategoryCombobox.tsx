@@ -1,17 +1,16 @@
-import { useState, memo } from "react";
-import { Check, ChevronsUpDown, Plus } from "lucide-react";
-import { cn } from "../ui/utils";
-import { Button } from "../ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "../ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { useMemo, useState, memo } from "react";
+import { Plus } from "lucide-react";
 import { useCategories } from "../../hooks/useCategories";
+import { adminFieldClass } from "./AdminFormField";
+import { Input } from "../ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
+import { Button } from "../ui/button";
 
 interface CategoryComboboxProps {
   value: string;
@@ -19,104 +18,110 @@ interface CategoryComboboxProps {
   className?: string;
 }
 
-export const CategoryCombobox = memo(function CategoryCombobox({ value, onChange, className }: CategoryComboboxProps) {
-  const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState("");
-  const { categories, addCategory } = useCategories();
+const CUSTOM_VALUE = "__custom__";
 
-  const handleSelect = (name: string) => {
-    onChange(name);
-    setOpen(false);
+export const CategoryCombobox = memo(function CategoryCombobox({
+  value,
+  onChange,
+  className,
+}: CategoryComboboxProps) {
+  const { categories, loading, addCategory } = useCategories();
+  const [customMode, setCustomMode] = useState(false);
+  const [customName, setCustomName] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const categoryNames = useMemo(() => categories.map((c) => c.name), [categories]);
+
+  const selectValue = useMemo(() => {
+    if (!value) return "";
+    if (categoryNames.includes(value)) return value;
+    return CUSTOM_VALUE;
+  }, [value, categoryNames]);
+
+  const handleSelect = (selected: string) => {
+    if (selected === CUSTOM_VALUE) {
+      setCustomMode(true);
+      setCustomName(value && !categoryNames.includes(value) ? value : "");
+      return;
+    }
+    setCustomMode(false);
+    onChange(selected);
   };
 
-  const handleCreate = async () => {
-    const trimmed = search.trim();
+  const handleApplyCustom = async () => {
+    const trimmed = customName.trim();
     if (!trimmed) return;
+
+    setSaving(true);
     try {
-      const cat = await addCategory(trimmed);
-      onChange(cat.name);
-      setOpen(false);
-      setSearch("");
+      if (!categoryNames.some((n) => n.toLowerCase() === trimmed.toLowerCase())) {
+        await addCategory(trimmed);
+      }
+      onChange(trimmed);
+      setCustomMode(false);
+      setCustomName("");
     } catch {
       onChange(trimmed);
-      setOpen(false);
+      setCustomMode(false);
+    } finally {
+      setSaving(false);
     }
   };
 
-  const filtered = categories.filter((c) =>
-    c.name.toLowerCase().includes(search.toLowerCase())
-  );
-  const showCreate =
-    search.trim() &&
-    !categories.some((c) => c.name.toLowerCase() === search.trim().toLowerCase());
+  if (customMode) {
+    return (
+      <div className={`flex gap-2 ${className ?? ""}`}>
+        <Input
+          value={customName}
+          onChange={(e) => setCustomName(e.target.value)}
+          placeholder="Type new category…"
+          className={adminFieldClass}
+          autoFocus
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              void handleApplyCustom();
+            }
+          }}
+        />
+        <Button
+          type="button"
+          onClick={() => void handleApplyCustom()}
+          disabled={saving || !customName.trim()}
+          className="shrink-0 bg-gradient-to-r from-[#cd3f2c] to-[#db7d30]"
+        >
+          {saving ? "…" : "Add"}
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => setCustomMode(false)}
+          className="shrink-0 border-white/10 text-gray-300"
+        >
+          Cancel
+        </Button>
+      </div>
+    );
+  }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className={cn(
-            "w-full justify-between bg-white/5 border-white/10 text-white hover:bg-white/10 hover:text-white font-normal",
-            !value && "text-gray-500",
-            className
-          )}
-        >
-          {value || "Select category…"}
-          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[--radix-popover-trigger-width] p-0 bg-gray-900 border-white/10">
-        <Command className="bg-transparent" shouldFilter={false}>
-          <CommandInput
-            placeholder="Search or type new…"
-            value={search}
-            onValueChange={setSearch}
-            className="text-white"
-          />
-          <CommandList>
-            <CommandEmpty>
-              {showCreate ? (
-                <button
-                  type="button"
-                  onClick={handleCreate}
-                  className="flex items-center gap-2 w-full px-2 py-1.5 text-sm text-[#edcca5] hover:text-white"
-                >
-                  <Plus className="w-4 h-4" />
-                  Create &quot;{search.trim()}&quot;
-                </button>
-              ) : (
-                <span className="text-gray-500 text-sm">No categories found.</span>
-              )}
-            </CommandEmpty>
-            <CommandGroup>
-              {filtered.map((cat) => (
-                <CommandItem
-                  key={cat.id}
-                  value={cat.name}
-                  onSelect={() => handleSelect(cat.name)}
-                  className="text-white"
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === cat.name ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {cat.name}
-                </CommandItem>
-              ))}
-              {showCreate && filtered.length > 0 && (
-                <CommandItem onSelect={handleCreate} className="text-[#edcca5]">
-                  <Plus className="mr-2 h-4 w-4" />
-                  Create &quot;{search.trim()}&quot;
-                </CommandItem>
-              )}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+    <Select value={selectValue || undefined} onValueChange={handleSelect} disabled={loading}>
+      <SelectTrigger className={`${adminFieldClass} ${className ?? ""}`}>
+        <SelectValue placeholder={loading ? "Loading…" : "Select category…"} />
+      </SelectTrigger>
+      <SelectContent className="z-[200] bg-gray-900 border-white/10">
+        {categoryNames.map((name) => (
+          <SelectItem key={name} value={name} className="text-white">
+            {name}
+          </SelectItem>
+        ))}
+        <SelectItem value={CUSTOM_VALUE} className="text-[#edcca5]">
+          <span className="flex items-center gap-2">
+            <Plus className="w-3.5 h-3.5" />
+            Add new category…
+          </span>
+        </SelectItem>
+      </SelectContent>
+    </Select>
   );
 });

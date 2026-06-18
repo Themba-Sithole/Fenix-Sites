@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -34,10 +35,20 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fetchInFlightRef = useRef(false);
 
-  const canViewStaffData = hasRole("super_admin", "admin", "editor", "finance", "viewer");
-  const canViewInquiries = hasRole("super_admin", "admin", "editor");
-  const canViewFinance = hasRole("super_admin", "admin", "finance");
+  const canViewStaffData = useMemo(
+    () => hasRole("super_admin", "admin", "editor", "finance", "viewer"),
+    [hasRole]
+  );
+  const canViewInquiries = useMemo(
+    () => hasRole("super_admin", "admin", "editor"),
+    [hasRole]
+  );
+  const canViewFinance = useMemo(
+    () => hasRole("super_admin", "admin", "finance"),
+    [hasRole]
+  );
 
   const fetchAll = useCallback(
     async (isRefresh = false) => {
@@ -47,6 +58,9 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       }
 
       if (authLoading || !role) return;
+      if (fetchInFlightRef.current) return;
+
+      fetchInFlightRef.current = true;
 
       if (isRefresh) setRefreshing(true);
       else setLoading(true);
@@ -111,8 +125,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
               supabase
                 .from("finance_records")
                 .select("*, clients(id, name, company)")
-                .order("created_at", { ascending: false })
-                .limit(20),
+                .order("created_at", { ascending: false }),
               setFinanceRecords
             )
           );
@@ -130,10 +143,18 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       } finally {
         setLoading(false);
         setRefreshing(false);
+        fetchInFlightRef.current = false;
       }
     },
     [authLoading, role, canViewStaffData, canViewInquiries, canViewFinance]
   );
+
+  const fetchAllRef = useRef(fetchAll);
+  fetchAllRef.current = fetchAll;
+
+  const refetch = useCallback(async () => {
+    await fetchAllRef.current(true);
+  }, []);
 
   useEffect(() => {
     if (authLoading) return;
@@ -159,7 +180,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       refreshing,
       error,
       newInquiryCount,
-      refetch: () => fetchAll(true),
+      refetch,
     }),
     [
       projects,
@@ -170,7 +191,7 @@ export function AdminDataProvider({ children }: { children: ReactNode }) {
       refreshing,
       error,
       newInquiryCount,
-      fetchAll,
+      refetch,
     ]
   );
 

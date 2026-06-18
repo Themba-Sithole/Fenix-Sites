@@ -2,13 +2,14 @@ import { useCallback, useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import type { Inquiry, InquiryInsert, InquiryStatus } from "../lib/types/database";
 
-export function useInquiries() {
+export function useInquiries(options?: { enabled?: boolean }) {
+  const enabled = options?.enabled ?? true;
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
 
   const fetchInquiries = useCallback(async () => {
-    if (!supabase) {
+    if (!enabled || !supabase) {
       setLoading(false);
       return;
     }
@@ -27,11 +28,16 @@ export function useInquiries() {
       setError(null);
     }
     setLoading(false);
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
+    if (!enabled) {
+      setInquiries([]);
+      setLoading(false);
+      return;
+    }
     fetchInquiries();
-  }, [fetchInquiries]);
+  }, [fetchInquiries, enabled]);
 
   const updateInquiry = async (id: string, status: InquiryStatus) => {
     if (!supabase) throw new Error("Supabase not configured");
@@ -61,7 +67,7 @@ export function useInquiries() {
 }
 
 export async function submitInquiry(payload: InquiryInsert) {
-  if (!supabase) return { error: null };
+  if (!supabase) return { error: "Database not configured" };
   const { error } = await supabase.from("inquiries").insert({
     ...payload,
     status: "new",

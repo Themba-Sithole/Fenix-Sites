@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { MessageSquare, Send, Plus, Phone, X } from "lucide-react";
+import { Link } from "react-router-dom";
+import { MessageSquare, Send, Plus, Mail, X } from "lucide-react";
 import { useMessages } from "../../hooks/useMessages";
 import { Card } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
@@ -33,7 +34,6 @@ export function AdminMessagesPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [newConvo, setNewConvo] = useState({
     participant_name: "",
-    participant_phone: "",
     subject: "",
   });
 
@@ -54,10 +54,9 @@ export function AdminMessagesPage() {
     e.preventDefault();
     await createConversation({
       participant_name: newConvo.participant_name,
-      participant_phone: newConvo.participant_phone || undefined,
       subject: newConvo.subject || undefined,
     });
-    setNewConvo({ participant_name: "", participant_phone: "", subject: "" });
+    setNewConvo({ participant_name: "", subject: "" });
     setDialogOpen(false);
   };
 
@@ -74,22 +73,28 @@ export function AdminMessagesPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-white text-2xl font-semibold mb-1">Messages</h1>
-          <p className="text-gray-500 text-sm">Text clients and track conversations</p>
+          <p className="text-gray-500 text-sm">
+            Internal notes on client communication. Customer emails arrive in{" "}
+            <Link to="/admin/inquiries" className="text-[#edcca5] hover:text-white">
+              Inquiries
+            </Link>
+            .
+          </p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
             <Button className="bg-gradient-to-r from-[#cd3f2c] to-[#db7d30]">
               <Plus className="w-4 h-4 mr-2" />
-              New Conversation
+              New Thread
             </Button>
           </DialogTrigger>
           <DialogContent className="bg-gray-900 border-white/10 text-white max-w-md">
             <DialogHeader>
-              <DialogTitle>Start Conversation</DialogTitle>
+              <DialogTitle>Start Internal Thread</DialogTitle>
             </DialogHeader>
             <form onSubmit={handleCreate} className="space-y-4">
               <div>
-                <Label className="text-gray-300">Contact Name *</Label>
+                <Label className="text-gray-300">Client / Contact Name *</Label>
                 <Input
                   value={newConvo.participant_name}
                   onChange={(e) =>
@@ -100,42 +105,40 @@ export function AdminMessagesPage() {
                 />
               </div>
               <div>
-                <Label className="text-gray-300">Phone Number</Label>
-                <Input
-                  value={newConvo.participant_phone}
-                  onChange={(e) =>
-                    setNewConvo({ ...newConvo, participant_phone: e.target.value })
-                  }
-                  placeholder="+27 …"
-                  className="mt-1 bg-white/5 border-white/10 text-white"
-                />
-              </div>
-              <div>
                 <Label className="text-gray-300">Subject</Label>
                 <Input
                   value={newConvo.subject}
                   onChange={(e) => setNewConvo({ ...newConvo, subject: e.target.value })}
+                  placeholder="e.g. Follow-up on website quote"
                   className="mt-1 bg-white/5 border-white/10 text-white"
                 />
               </div>
               <Button type="submit" className="w-full bg-gradient-to-r from-[#cd3f2c] to-[#db7d30]">
-                Start Chat
+                Create Thread
               </Button>
             </form>
           </DialogContent>
         </Dialog>
       </div>
 
-      <div className="grid lg:grid-cols-[320px_1fr] gap-4 h-[calc(100vh-220px)] min-h-[500px]">
+      <Card className="bg-white/[0.02] border-white/[0.06] p-4 rounded-xl flex items-start gap-3">
+        <Mail className="w-4 h-4 text-[#db7d30] shrink-0 mt-0.5" />
+        <p className="text-gray-400 text-sm">
+          Clients reach you by email through the contact form. Use this page to log follow-ups
+          and internal notes — not to send email to customers.
+        </p>
+      </Card>
+
+      <div className="grid lg:grid-cols-[320px_1fr] gap-4 h-[calc(100vh-280px)] min-h-[500px]">
         <Card className="bg-white/[0.03] border-white/10 overflow-hidden flex flex-col">
           <div className="p-4 border-b border-white/10">
             <p className="text-gray-400 text-xs uppercase tracking-wider">
-              {conversations.length} conversations
+              {conversations.length} threads
             </p>
           </div>
           <ScrollArea className="flex-1">
             {conversations.length === 0 ? (
-              <p className="text-gray-500 text-sm p-4 text-center">No conversations yet</p>
+              <p className="text-gray-500 text-sm p-4 text-center">No threads yet</p>
             ) : (
               conversations.map((c) => (
                 <button
@@ -161,12 +164,6 @@ export function AdminMessagesPage() {
                   {c.subject && (
                     <p className="text-gray-500 text-xs truncate">{c.subject}</p>
                   )}
-                  {c.participant_phone && (
-                    <p className="text-gray-600 text-xs flex items-center gap-1 mt-1">
-                      <Phone className="w-3 h-3" />
-                      {c.participant_phone}
-                    </p>
-                  )}
                 </button>
               ))
             )}
@@ -177,15 +174,15 @@ export function AdminMessagesPage() {
           {!active ? (
             <div className="flex-1 flex flex-col items-center justify-center text-gray-500">
               <MessageSquare className="w-12 h-12 mb-3 opacity-30" />
-              <p>Select a conversation or start a new one</p>
+              <p>Select a thread or create a new one</p>
             </div>
           ) : (
             <>
               <div className="p-4 border-b border-white/10 flex items-center justify-between">
                 <div>
                   <p className="text-white font-medium">{active.participant_name}</p>
-                  {active.participant_phone && (
-                    <p className="text-gray-500 text-xs">{active.participant_phone}</p>
+                  {active.subject && (
+                    <p className="text-gray-500 text-xs">{active.subject}</p>
                   )}
                 </div>
                 {active.status === "open" && (
@@ -233,7 +230,7 @@ export function AdminMessagesPage() {
                   <Textarea
                     value={newMsg}
                     onChange={(e) => setNewMsg(e.target.value)}
-                    placeholder="Type a message…"
+                    placeholder="Add an internal note…"
                     rows={2}
                     className="bg-white/5 border-white/10 text-white resize-none flex-1"
                     onKeyDown={(e) => {

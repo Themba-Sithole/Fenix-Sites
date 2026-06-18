@@ -44,6 +44,31 @@ export function useMessages() {
     else setMessages([]);
   }, [activeId, fetchMessages]);
 
+  useEffect(() => {
+    if (!supabase || !activeId) return;
+
+    const channel = supabase
+      .channel(`messages:${activeId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `conversation_id=eq.${activeId}`,
+        },
+        () => {
+          void fetchMessages(activeId);
+          void fetchConversations();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [activeId, fetchMessages, fetchConversations]);
+
   const createConversation = async (payload: {
     participant_name: string;
     participant_phone?: string;
@@ -65,7 +90,9 @@ export function useMessages() {
 
   const sendMessage = async (conversationId: string, body: string) => {
     if (!supabase) throw new Error("Supabase not configured");
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     const { error } = await supabase.from("messages").insert({
       conversation_id: conversationId,
       sender_id: user?.id ?? null,

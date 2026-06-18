@@ -10,6 +10,7 @@ import { Badge } from "./ui/badge";
 import { motion } from "motion/react";
 import { useState } from "react";
 import { submitInquiry } from "../hooks/useInquiries";
+import { isSupabaseConfigured } from "../lib/supabase";
 
 export function Contact() {
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
@@ -42,49 +43,73 @@ export function Contact() {
     setFormStatus('sending');
     
     try {
-      // Save to admin dashboard
-      await submitInquiry({
+      const inquiryPayload = {
         name: formData.name,
         email: formData.email,
         phone: formData.phone || null,
         budget: formData.budget || null,
         service: formData.service || null,
         message: formData.message,
-      });
+      };
 
-      const response = await fetch('https://formspree.io/f/mgvqqopy', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          _replyto: formData.email,
-          _subject: `New Contact Form Submission from ${formData.name}`,
-          _to: 'tjsgamerspro1@gmail.com'
-        }),
-      });
+      if (isSupabaseConfigured) {
+        const { error: inquiryError } = await submitInquiry(inquiryPayload);
+        if (inquiryError) {
+          throw new Error(inquiryError);
+        }
 
-      if (response.ok) {
+        // Notify via Formspree in the background (non-blocking)
+        void fetch('https://formspree.io/f/mgvqqopy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...formData,
+            _replyto: formData.email,
+            _subject: `New Contact Form Submission from ${formData.name}`,
+            _to: 'tjsgamerspro1@gmail.com',
+          }),
+        }).catch(() => undefined);
+
         setFormStatus('success');
-        // Reset form
         setFormData({
           name: '',
           email: '',
           phone: '',
           budget: '',
           service: '',
-          message: ''
+          message: '',
         });
       } else {
-        throw new Error('Failed to send message');
+        const response = await fetch('https://formspree.io/f/mgvqqopy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...formData,
+            _replyto: formData.email,
+            _subject: `New Contact Form Submission from ${formData.name}`,
+            _to: 'tjsgamerspro1@gmail.com',
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to send message');
+        }
+
+        setFormStatus('success');
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          budget: '',
+          service: '',
+          message: '',
+        });
       }
     } catch (error) {
       console.error('Error sending form:', error);
       setFormStatus('error');
     }
 
-    // Reset status after 3 seconds
     setTimeout(() => setFormStatus('idle'), 3000);
   };
 

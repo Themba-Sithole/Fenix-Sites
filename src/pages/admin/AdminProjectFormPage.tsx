@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, lazy, Suspense, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { ArrowLeft, Upload, X, Star } from "lucide-react";
 import { supabase } from "../../lib/supabase";
@@ -6,16 +6,20 @@ import { useProjects } from "../../hooks/useProjects";
 import { useClients } from "../../hooks/useClients";
 import { useProjectImages } from "../../hooks/useProjectImages";
 import type { ProjectFilter, ProjectInsert } from "../../lib/types/database";
-
-const CategoryCombobox = lazy(() =>
-  import("../../components/admin/CategoryCombobox").then((m) => ({ default: m.CategoryCombobox }))
-);
+import { CategoryCombobox } from "../../components/admin/CategoryCombobox";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
-import { Label } from "../../components/ui/label";
 import { Textarea } from "../../components/ui/textarea";
 import { Card } from "../../components/ui/card";
 import { Switch } from "../../components/ui/switch";
+import {
+  AdminFormField,
+  AdminPageHeader,
+  adminCardClass,
+  adminFieldClass,
+  adminSwitchClass,
+  adminTextareaClass,
+} from "../../components/admin/AdminFormField";
 import {
   Select,
   SelectContent,
@@ -173,69 +177,64 @@ export function AdminProjectFormPage() {
         Back to projects
       </Link>
 
-      <h1 className="text-white text-2xl font-semibold mb-6">
-        {isEdit ? "Edit Project" : "New Project"}
-      </h1>
+      <AdminPageHeader
+        title={isEdit ? "Edit Project" : "New Project"}
+        description="Add portfolio details, photos, and visibility settings."
+      />
 
-      <Card className="bg-white/[0.03] border-white/10 p-6">
-        <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="sm:col-span-2">
-              <Label className="text-gray-300">Title *</Label>
+      <Card className={`${adminCardClass} p-6 md:p-8`}>
+        <form onSubmit={handleSubmit} className="space-y-8 max-w-3xl">
+          <div className="space-y-6">
+            <AdminFormField label="Title" required>
               <Input
                 value={form.title}
                 onChange={(e) => setForm({ ...form, title: e.target.value })}
                 required
-                className="mt-1.5 bg-white/5 border-white/10 text-white"
+                className={adminFieldClass}
               />
+            </AdminFormField>
+
+            <div className="grid sm:grid-cols-2 gap-6">
+              <AdminFormField label="Category" required>
+                <CategoryCombobox
+                  value={form.category}
+                  onChange={(v) => setForm((f) => ({ ...f, category: v }))}
+                />
+              </AdminFormField>
+
+              <AdminFormField label="Filter">
+                <Select
+                  value={form.filter_category}
+                  onValueChange={(v) =>
+                    setForm({ ...form, filter_category: v as ProjectFilter })
+                  }
+                >
+                  <SelectTrigger className={adminFieldClass}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="z-[200] bg-gray-900 border-white/10">
+                    {["ecommerce", "webapp", "mobile", "design"].map((f) => (
+                      <SelectItem key={f} value={f} className="capitalize text-white">
+                        {f === "webapp" ? "Web App" : f}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </AdminFormField>
             </div>
-            <div>
-              <Label className="text-gray-300">Category *</Label>
-              <div className="mt-1.5">
-                <Suspense fallback={
-                  <div className="h-9 rounded-md bg-white/5 border border-white/10 animate-pulse" />
-                }>
-                  <CategoryCombobox
-                    value={form.category}
-                    onChange={(v) => setForm((f) => ({ ...f, category: v }))}
-                  />
-                </Suspense>
-              </div>
-            </div>
-            <div>
-              <Label className="text-gray-300">Filter</Label>
-              <Select
-                value={form.filter_category}
-                onValueChange={(v) =>
-                  setForm({ ...form, filter_category: v as ProjectFilter })
-                }
-              >
-                <SelectTrigger className="mt-1.5 bg-white/5 border-white/10 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-900 border-white/10">
-                  {["ecommerce", "webapp", "mobile", "design"].map((f) => (
-                    <SelectItem key={f} value={f} className="capitalize text-white">
-                      {f === "webapp" ? "Web App" : f}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="sm:col-span-2">
-              <Label className="text-gray-300">Description</Label>
+
+            <AdminFormField label="Description">
               <Textarea
                 value={form.description ?? ""}
                 onChange={(e) => setForm({ ...form, description: e.target.value })}
-                rows={3}
-                className="mt-1.5 bg-white/5 border-white/10 text-white"
+                rows={4}
+                className={adminTextareaClass}
               />
-            </div>
+            </AdminFormField>
 
             {/* Photo upload */}
-            <div className="sm:col-span-2">
-              <Label className="text-gray-300">Project Photos</Label>
-              <div className="mt-1.5 space-y-3">
+            <AdminFormField label="Project Photos" hint="JPG, PNG, or WebP up to 5MB each.">
+              <div className="space-y-3">
                 <input
                   ref={fileRef}
                   type="file"
@@ -254,7 +253,6 @@ export function AdminProjectFormPage() {
                   <span className="text-sm">
                     {uploading ? "Uploading…" : "Click to upload photos"}
                   </span>
-                  <span className="text-xs text-gray-600">JPG, PNG, WebP up to 5MB</span>
                 </button>
 
                 {(previewUrls.length > 0 || images.length > 0) && (
@@ -305,112 +303,116 @@ export function AdminProjectFormPage() {
                   </div>
                 )}
               </div>
-            </div>
+            </AdminFormField>
 
-            <div className="sm:col-span-2">
-              <Label className="text-gray-300">Or paste Image URL</Label>
+            <AdminFormField label="Or paste Image URL">
               <Input
                 value={form.image_url ?? ""}
                 onChange={(e) => setForm({ ...form, image_url: e.target.value })}
                 placeholder="https://…"
-                className="mt-1.5 bg-white/5 border-white/10 text-white"
+                className={adminFieldClass}
               />
+            </AdminFormField>
+
+            <div className="grid sm:grid-cols-2 gap-6">
+              <AdminFormField label="Client">
+                <Select
+                  value={form.client_id ?? "none"}
+                  onValueChange={(v) =>
+                    setForm({ ...form, client_id: v === "none" ? null : v })
+                  }
+                >
+                  <SelectTrigger className={adminFieldClass}>
+                    <SelectValue placeholder="Select client" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-900 border-white/10">
+                    <SelectItem value="none" className="text-white">None</SelectItem>
+                    {clients.map((c) => (
+                      <SelectItem key={c.id} value={c.id} className="text-white">
+                        {c.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </AdminFormField>
+
+              <AdminFormField label="Duration">
+                <Input
+                  value={form.duration ?? ""}
+                  onChange={(e) => setForm({ ...form, duration: e.target.value })}
+                  placeholder="2 months"
+                  className={adminFieldClass}
+                />
+              </AdminFormField>
+
+              <AdminFormField label="Result / Metric">
+                <Input
+                  value={form.result ?? ""}
+                  onChange={(e) => setForm({ ...form, result: e.target.value })}
+                  placeholder="+250% Sales"
+                  className={adminFieldClass}
+                />
+              </AdminFormField>
+
+              <AdminFormField label="Live URL">
+                <Input
+                  value={form.live_url ?? ""}
+                  onChange={(e) => setForm({ ...form, live_url: e.target.value })}
+                  placeholder="https://client-site.com"
+                  className={adminFieldClass}
+                />
+              </AdminFormField>
             </div>
 
-            <div>
-              <Label className="text-gray-300">Client</Label>
-              <Select
-                value={form.client_id ?? "none"}
-                onValueChange={(v) =>
-                  setForm({ ...form, client_id: v === "none" ? null : v })
-                }
-              >
-                <SelectTrigger className="mt-1.5 bg-white/5 border-white/10 text-white">
-                  <SelectValue placeholder="Select client" />
-                </SelectTrigger>
-                <SelectContent className="bg-gray-900 border-white/10">
-                  <SelectItem value="none" className="text-white">None</SelectItem>
-                  {clients.map((c) => (
-                    <SelectItem key={c.id} value={c.id} className="text-white">
-                      {c.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label className="text-gray-300">Duration</Label>
-              <Input
-                value={form.duration ?? ""}
-                onChange={(e) => setForm({ ...form, duration: e.target.value })}
-                placeholder="2 months"
-                className="mt-1.5 bg-white/5 border-white/10 text-white"
-              />
-            </div>
-            <div>
-              <Label className="text-gray-300">Result / Metric</Label>
-              <Input
-                value={form.result ?? ""}
-                onChange={(e) => setForm({ ...form, result: e.target.value })}
-                placeholder="+250% Sales"
-                className="mt-1.5 bg-white/5 border-white/10 text-white"
-              />
-            </div>
-            <div>
-              <Label className="text-gray-300">Live URL</Label>
-              <Input
-                value={form.live_url ?? ""}
-                onChange={(e) => setForm({ ...form, live_url: e.target.value })}
-                placeholder="https://client-site.com"
-                className="mt-1.5 bg-white/5 border-white/10 text-white"
-              />
-            </div>
-            <div className="sm:col-span-2">
-              <Label className="text-gray-300">Tags (comma-separated)</Label>
-              <Input
-                value={tagsInput}
-                onChange={(e) => setTagsInput(e.target.value)}
-                placeholder="React, Tailwind, SEO"
-                className="mt-1.5 bg-white/5 border-white/10 text-white"
-              />
-            </div>
-            <div>
-              <Label className="text-gray-300">Sort Order</Label>
-              <Input
-                type="number"
-                value={form.sort_order}
-                onChange={(e) =>
-                  setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })
-                }
-                className="mt-1.5 bg-white/5 border-white/10 text-white"
-              />
+            <div className="grid sm:grid-cols-2 gap-6">
+              <AdminFormField label="Tags" hint="Comma-separated" className="sm:col-span-2">
+                <Input
+                  value={tagsInput}
+                  onChange={(e) => setTagsInput(e.target.value)}
+                  placeholder="React, Tailwind, SEO"
+                  className={adminFieldClass}
+                />
+              </AdminFormField>
+
+              <AdminFormField label="Sort Order">
+                <Input
+                  type="number"
+                  value={form.sort_order}
+                  onChange={(e) =>
+                    setForm({ ...form, sort_order: parseInt(e.target.value) || 0 })
+                  }
+                  className={adminFieldClass}
+                />
+              </AdminFormField>
             </div>
           </div>
 
-          <div className="rounded-xl bg-white/[0.02] border border-white/10 p-4 space-y-4">
-            <p className="text-gray-400 text-xs uppercase tracking-wider">Visibility</p>
-            <div className="flex items-center justify-between">
+          <div className="rounded-xl bg-white/[0.02] border border-white/[0.08] p-5 space-y-5">
+            <p className="text-gray-500 text-xs uppercase tracking-wider">Visibility</p>
+            <div className="flex items-center justify-between gap-4">
               <div>
-                <Label className="text-white text-sm">Show in Portfolio</Label>
-                <p className="text-gray-600 text-xs mt-0.5">
+                <p className="text-white text-sm font-medium">Show in Portfolio</p>
+                <p className="text-gray-500 text-xs mt-1">
                   Display this project on the public portfolio page
                 </p>
               </div>
               <Switch
                 checked={form.published}
                 onCheckedChange={(v) => setForm({ ...form, published: v })}
+                className={adminSwitchClass}
               />
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between gap-4">
               <div>
-                <Label className="text-white text-sm">Featured on Homepage</Label>
-                <p className="text-gray-600 text-xs mt-0.5">
+                <p className="text-white text-sm font-medium">Featured on Homepage</p>
+                <p className="text-gray-500 text-xs mt-1">
                   Highlight on the homepage work section
                 </p>
               </div>
               <Switch
                 checked={form.featured}
                 onCheckedChange={(v) => setForm({ ...form, featured: v })}
+                className={adminSwitchClass}
               />
             </div>
           </div>

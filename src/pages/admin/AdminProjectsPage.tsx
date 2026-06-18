@@ -6,6 +6,7 @@ import { Button } from "../../components/ui/button";
 import { Card } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
 import { Input } from "../../components/ui/input";
+import { AdminPageHeader, adminFieldClass } from "../../components/admin/AdminFormField";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -58,24 +59,24 @@ export function AdminProjectsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-white text-2xl font-semibold mb-1">Projects</h1>
-          <p className="text-gray-400 text-sm">Manage portfolio projects shown on your site</p>
-        </div>
-        <Link to="/admin/projects/new">
-          <Button className="bg-gradient-to-r from-[#cd3f2c] to-[#db7d30]">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Project
-          </Button>
-        </Link>
-      </div>
+      <AdminPageHeader
+        title="Projects"
+        description="Manage portfolio projects shown on your site"
+        actions={
+          <Link to="/admin/projects/new">
+            <Button className="bg-gradient-to-r from-[#cd3f2c] to-[#db7d30]">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Project
+            </Button>
+          </Link>
+        }
+      />
 
       <Input
         placeholder="Search projects…"
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        className="bg-white/5 border-white/10 text-white max-w-sm mb-6"
+        className={`${adminFieldClass} max-w-sm mb-6`}
       />
 
       {filtered.length === 0 ? (

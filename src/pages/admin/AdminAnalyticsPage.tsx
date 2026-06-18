@@ -1,15 +1,20 @@
-import { BarChart3, FolderKanban, Users, Inbox } from "lucide-react";
+import { FolderKanban, Users, Inbox } from "lucide-react";
 import { useProjects } from "../../hooks/useProjects";
 import { useClients } from "../../hooks/useClients";
 import { useInquiries } from "../../hooks/useInquiries";
-import { Card } from "../../components/ui/card";
+import { useAuth } from "../../context/AuthContext";
+import { AdminPageHeader, AdminSection } from "../../components/admin/AdminFormField";
+import { AdminStatCard } from "../../components/admin/AdminWidgets";
 
 export function AdminAnalyticsPage() {
+  const { hasRole } = useAuth();
+  const canViewInquiries = hasRole("super_admin", "admin", "editor");
+
   const { projects, loading: pLoading } = useProjects({ admin: true });
   const { clients, loading: cLoading } = useClients();
-  const { inquiries, loading: iLoading } = useInquiries();
+  const { inquiries, loading: iLoading } = useInquiries({ enabled: canViewInquiries });
 
-  if (pLoading || cLoading || iLoading) {
+  if (pLoading || cLoading || (canViewInquiries && iLoading)) {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="w-8 h-8 border-2 border-[#db7d30] border-t-transparent rounded-full animate-spin" />
@@ -37,46 +42,32 @@ export function AdminAnalyticsPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-white text-2xl font-semibold mb-1">Analytics</h1>
-        <p className="text-gray-500 text-sm">Overview of your agency performance</p>
+      <AdminPageHeader
+        title="Analytics"
+        description="Overview of your agency performance"
+      />
+
+      <div className={`grid gap-4 ${canViewInquiries ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+        <AdminStatCard label="Publish rate" value={`${publishRate}%`} icon={FolderKanban} />
+        <AdminStatCard label="Total clients" value={clients.length} icon={Users} accent="text-emerald-400" />
+        {canViewInquiries && (
+          <AdminStatCard label="Total inquiries" value={inquiries.length} icon={Inbox} />
+        )}
       </div>
 
-      <div className="grid sm:grid-cols-3 gap-4">
-        <Card className="bg-white/[0.03] border-white/10 p-6 text-center">
-          <FolderKanban className="w-8 h-8 text-[#db7d30] mx-auto mb-3" />
-          <p className="text-3xl font-bold text-white">{publishRate}%</p>
-          <p className="text-gray-500 text-sm">Publish rate</p>
-        </Card>
-        <Card className="bg-white/[0.03] border-white/10 p-6 text-center">
-          <Users className="w-8 h-8 text-emerald-400 mx-auto mb-3" />
-          <p className="text-3xl font-bold text-white">{clients.length}</p>
-          <p className="text-gray-500 text-sm">Total clients</p>
-        </Card>
-        <Card className="bg-white/[0.03] border-white/10 p-6 text-center">
-          <Inbox className="w-8 h-8 text-[#cd3f2c] mx-auto mb-3" />
-          <p className="text-3xl font-bold text-white">{inquiries.length}</p>
-          <p className="text-gray-500 text-sm">Total inquiries</p>
-        </Card>
-      </div>
-
-      <div className="grid md:grid-cols-3 gap-6">
-        <Card className="bg-white/[0.03] border-white/10 p-6">
-          <div className="flex items-center gap-2 mb-5">
-            <BarChart3 className="w-4 h-4 text-[#db7d30]" />
-            <h2 className="text-white font-medium">Projects by Type</h2>
-          </div>
+      <div className={`grid gap-6 ${canViewInquiries ? "md:grid-cols-3" : "md:grid-cols-2"}`}>
+        <AdminSection title="Projects by category">
           {Object.keys(byCategory).length === 0 ? (
             <p className="text-gray-500 text-sm">No data yet</p>
           ) : (
             <div className="space-y-3">
               {Object.entries(byCategory).map(([cat, count]) => (
                 <div key={cat}>
-                  <div className="flex justify-between text-sm mb-1">
+                  <div className="flex justify-between text-sm mb-1.5">
                     <span className="text-gray-400 capitalize">{cat}</span>
-                    <span className="text-white">{count}</span>
+                    <span className="text-white tabular-nums">{count}</span>
                   </div>
-                  <div className="h-1.5 bg-white/5 rounded-full">
+                  <div className="h-1.5 bg-white/[0.04] rounded-full overflow-hidden">
                     <div
                       className="h-full bg-gradient-to-r from-[#cd3f2c] to-[#db7d30] rounded-full"
                       style={{ width: `${(count / projects.length) * 100}%` }}
@@ -86,39 +77,39 @@ export function AdminAnalyticsPage() {
               ))}
             </div>
           )}
-        </Card>
+        </AdminSection>
 
-        <Card className="bg-white/[0.03] border-white/10 p-6">
-          <h2 className="text-white font-medium mb-5">Clients by Status</h2>
+        <AdminSection title="Clients by status">
           {Object.keys(clientByStatus).length === 0 ? (
             <p className="text-gray-500 text-sm">No data yet</p>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {Object.entries(clientByStatus).map(([status, count]) => (
-                <div key={status} className="flex justify-between text-sm">
+                <div key={status} className="flex justify-between text-sm py-1">
                   <span className="text-gray-400 capitalize">{status}</span>
-                  <span className="text-white font-medium">{count}</span>
+                  <span className="text-white font-medium tabular-nums">{count}</span>
                 </div>
               ))}
             </div>
           )}
-        </Card>
+        </AdminSection>
 
-        <Card className="bg-white/[0.03] border-white/10 p-6">
-          <h2 className="text-white font-medium mb-5">Inquiries by Status</h2>
-          {Object.keys(inquiryByStatus).length === 0 ? (
-            <p className="text-gray-500 text-sm">No data yet</p>
-          ) : (
-            <div className="space-y-3">
-              {Object.entries(inquiryByStatus).map(([status, count]) => (
-                <div key={status} className="flex justify-between text-sm">
-                  <span className="text-gray-400 capitalize">{status}</span>
-                  <span className="text-white font-medium">{count}</span>
-                </div>
-              ))}
-            </div>
-          )}
-        </Card>
+        {canViewInquiries && (
+          <AdminSection title="Inquiries by status">
+            {Object.keys(inquiryByStatus).length === 0 ? (
+              <p className="text-gray-500 text-sm">No data yet</p>
+            ) : (
+              <div className="space-y-2">
+                {Object.entries(inquiryByStatus).map(([status, count]) => (
+                  <div key={status} className="flex justify-between text-sm py-1">
+                    <span className="text-gray-400 capitalize">{status}</span>
+                    <span className="text-white font-medium tabular-nums">{count}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </AdminSection>
+        )}
       </div>
     </div>
   );
